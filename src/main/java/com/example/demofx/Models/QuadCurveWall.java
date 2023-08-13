@@ -3,6 +3,7 @@ package com.example.demofx.Models;
 import com.example.demofx.Interfaces.IGraphPrimitive;
 import com.example.demofx.Interfaces.IPropertyChangeble;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
+import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
@@ -98,6 +99,8 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
     public void setStartPoint(double x, double y) {
         lastChange = "last change: " + date.getTime().toString().substring(0, 19);
         this.startPoint = new Point2D.Double(x, y);
+        this.startPointShape.setCenterX(x);
+        this.startPointShape.setCenterY(y);
         this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
                 controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
     }
@@ -113,6 +116,8 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
     public void setEndPoint(double x, double y) {
         lastChange = "last change: " + date.getTime().toString().substring(0, 19);
         this.endPoint = new Point2D.Double(x, y);
+        this.endPointShape.setCenterX(x);
+        this.endPointShape.setCenterY(y);
         this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
                 controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
     }
@@ -388,11 +393,59 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
             if (t.getSource() instanceof Circle) {
                 //если (новые коорды - сдвиг - положение стартовой точки) меньше единицы (поправка на округление),
                 //то считаем что распознали точку
-                if(Math.abs((newTranslateX - offsetX)-startPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY)-startPoint.getY()) < 1){
+                if (Math.abs((newTranslateX - offsetX) - startPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY) - startPoint.getY()) < 1) {
+                    if (WorkbenchProperties.getInstance().isControlDotsConnecting()) {
+                        String selectedLevelName = EventContextController.getWorkbenchProvider().getSelectedLevelName();
+                        int levelIndex = HouseProject.getInstance().getBuilding().getIndexLevelWithName(selectedLevelName);
+                        ArrayList<Point2D> points = HouseProject.getInstance().getBuilding().getLevels().get(levelIndex).GetPointsToConnect();
+
+                        double distX;
+                        double distSelfParePointX;
+                        double distY;
+                        double distSelfParePointY;
+                        int connectRadius;
+                        for (Point2D point : points) {
+                            distX = Math.abs(newTranslateX - point.getX());
+                            distY = Math.abs(newTranslateY - point.getY());
+                            distSelfParePointX = Math.abs(newTranslateX - endPoint.getX());
+                            distSelfParePointY = Math.abs(newTranslateY - endPoint.getY());
+                            connectRadius = WorkbenchProperties.getInstance().getControlDotsConnectingRadius();
+                            if (distX <= connectRadius && distSelfParePointX > connectRadius
+                                    && distY <= connectRadius && distSelfParePointY > connectRadius) {
+                                newTranslateX = point.getX();
+                                newTranslateY = point.getY();
+                                break;
+                            }
+                        }
+                    }
                     setStartPoint(newTranslateX, newTranslateY);
                 }
-                if(Math.abs((newTranslateX - offsetX)-endPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY)-endPoint.getY()) < 1){
-                    setEndPoint(newTranslateX,newTranslateY);
+                if (Math.abs((newTranslateX - offsetX) - endPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY) - endPoint.getY()) < 1) {
+                    if (WorkbenchProperties.getInstance().isControlDotsConnecting()) {
+                        String selectedLevelName = EventContextController.getWorkbenchProvider().getSelectedLevelName();
+                        int levelIndex = HouseProject.getInstance().getBuilding().getIndexLevelWithName(selectedLevelName);
+                        ArrayList<Point2D> points = HouseProject.getInstance().getBuilding().getLevels().get(levelIndex).GetPointsToConnect();
+
+                        double distX;
+                        double distSelfParePointX;
+                        double distY;
+                        double distSelfParePointY;
+                        int connectRadius;
+                        for (Point2D point : points) {
+                            distX = Math.abs(newTranslateX - point.getX());
+                            distY = Math.abs(newTranslateY - point.getY());
+                            distSelfParePointX = Math.abs(newTranslateX - startPoint.getX());
+                            distSelfParePointY = Math.abs(newTranslateY - startPoint.getY());
+                            connectRadius = WorkbenchProperties.getInstance().getControlDotsConnectingRadius();
+                            if (distX <= connectRadius && distSelfParePointX > connectRadius
+                                    && distY <= connectRadius && distSelfParePointY > connectRadius) {
+                                newTranslateX = point.getX();
+                                newTranslateY = point.getY();
+                                break;
+                            }
+                        }
+                    }
+                    setEndPoint(newTranslateX, newTranslateY);
                 }
                 if(Math.abs((newTranslateX - offsetX)-controlPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY)-controlPoint.getY()) < 1){
                     setControlPoint(newTranslateX,newTranslateY);

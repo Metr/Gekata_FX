@@ -94,8 +94,8 @@ public class Controller {
 
     //TODO local
     //Header menu
-    //  -Radius visibility
-    //  -Control dots trust-radius connect
+    //  -Radius visibility+
+    //  -Control dots trust-radius connect+
     //  -create/save/select file project
     //      -transport model
     //      -
