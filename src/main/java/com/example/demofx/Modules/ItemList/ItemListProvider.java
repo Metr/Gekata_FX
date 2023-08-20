@@ -1,22 +1,18 @@
 package com.example.demofx.Modules.ItemList;
 
 
-import com.example.demofx.Models.*;
+import com.example.demofx.Models.Basic.*;
 import com.example.demofx.Utils.Aggregators.LevelButtonsAggregator;
 import com.example.demofx.Utils.Aggregators.LevelItemButtonsAggregator;
 import com.example.demofx.Utils.Events.EventContextController;
-import javafx.beans.property.Property;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

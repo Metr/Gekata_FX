@@ -1,4 +1,4 @@
-package com.example.demofx.Models;
+package com.example.demofx.Models.Basic;
 
 import com.example.demofx.Interfaces.IGraphPrimitive;
 import com.example.demofx.Interfaces.IPropertyChangeble;
@@ -16,33 +16,29 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.QuadCurve;
+import javafx.scene.shape.Line;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.SortedMap;
 import java.util.UUID;
 
-public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
+public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
 
-    private final String ItemId;
+    private String ItemId;
 
     private Point2D startPoint;
     private Point2D endPoint;
 
-    private Point2D controlPoint;
-
-    private QuadCurve quadCurve;
+    private Line simpleWall;
 
     private String lastChange;
     private boolean isBeengChanged = false;
 
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
-    private Circle startPointShape;
-    private Circle endPointShape;
-    private Circle controlPointShape;
+    private Circle startPointShape, endPointShape;
 
     private static GregorianCalendar date;
 
@@ -50,50 +46,29 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         date = new GregorianCalendar();
     }
 
+    public BasicWall(Point2D startPoint, Point2D endPoint) {
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
 
-    public QuadCurveWall(double x1, double y1, double x2, double y2) {
+        lastChange = "last change: " + date.getTime().toString().substring(0, 19);
+    }
+
+    public BasicWall(double x1, double y1, double x2, double y2) {
         this.startPoint = new Point2D.Double(x1, y1);
         this.endPoint = new Point2D.Double(x2, y2);
-        this.controlPoint = new Point((int)(x2-x1), (int)(y2-y1));
-
         this.startPointShape = new Circle(startPoint.getX(), startPoint.getY(), 0);
         this.endPointShape = new Circle(endPoint.getX(), endPoint.getY(), 0);
-        this.controlPointShape = new Circle(controlPoint.getX(), controlPoint.getY(), 0);
-
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(),controlPoint.getY(),
-                endPoint.getX(), endPoint.getY());
+        this.simpleWall = new Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
         this.ItemId = UUID.randomUUID().toString();
         this.lastChange = "last change: " + date.getTime().toString().substring(0, 19);
     }
 
-    public QuadCurveWall(double x1, double y1, double control_x, double control_y, double x2, double y2) {
-        this.startPoint = new Point2D.Double(x1, y1);
-        this.endPoint = new Point2D.Double(x2, y2);
-        this.controlPoint = new Point((int)(control_x), (int)(control_y));
-
-        this.startPointShape = new Circle(startPoint.getX(), startPoint.getY(), 0);
-        this.endPointShape = new Circle(endPoint.getX(), endPoint.getY(), 0);
-        this.controlPointShape = new Circle(controlPoint.getX(), controlPoint.getY(), 0);
-
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(),controlPoint.getY(),
-                endPoint.getX(), endPoint.getY());
-
-        this.quadCurve.setStrokeWidth(3);
-        this.quadCurve.setStroke(Color.BLACK);
-        this.quadCurve.setFill(Color.TRANSPARENT);
-
-        this.ItemId = UUID.randomUUID().toString();
-        this.lastChange = "last change: " + date.getTime().toString().substring(0, 19);
-    }
 
     public void setStartPoint(Point2D startPoint) {
         lastChange = "last change: " + date.getTime().toString().substring(0, 19);
         this.startPoint = startPoint;
         this.startPointShape = new Circle(startPoint.getX(), startPoint.getY(), 0);
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
+        this.simpleWall = new Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
     }
 
     public void setStartPoint(double x, double y) {
@@ -101,16 +76,14 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         this.startPoint = new Point2D.Double(x, y);
         this.startPointShape.setCenterX(x);
         this.startPointShape.setCenterY(y);
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
+        this.simpleWall = new Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
     }
 
     public void setEndPoint(Point2D endPoint) {
         lastChange = "last change: " + date.getTime().toString().substring(0, 19);
         this.endPoint = endPoint;
         this.endPointShape = new Circle(endPoint.getX(), endPoint.getY(), 0);
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
+        this.simpleWall = new Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
     }
 
     public void setEndPoint(double x, double y) {
@@ -118,30 +91,9 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         this.endPoint = new Point2D.Double(x, y);
         this.endPointShape.setCenterX(x);
         this.endPointShape.setCenterY(y);
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
+        this.simpleWall = new Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
     }
 
-
-    public void setControlPoint(double x, double y) {
-        lastChange = "last change: " + date.getTime().toString().substring(0, 19);
-        this.controlPoint = new Point2D.Double(x, y);
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
-    }
-
-
-    public Point2D getControlPoint() {
-        return controlPoint;
-    }
-
-    public void setControlPoint(Point2D controlPoint) {
-        lastChange = "last change: " + date.getTime().toString().substring(0, 19);
-        this.controlPoint = controlPoint;
-        this.controlPointShape = new Circle(controlPoint.getX(), controlPoint.getY(), 0);
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
-    }
 
     public double getStartX() {
         return startPoint.getX();
@@ -159,18 +111,9 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         return endPoint.getY();
     }
 
-    public double getControlX() {
-        return controlPoint.getX();
-    }
-
-    public double getControlY() {
-        return controlPoint.getY();
-    }
-
-    public void setQuadCurve(QuadCurve newCurve) {
+    public void setLine(Line newLine) {
         lastChange = "last change: " + date.getTime().toString().substring(0, 19);
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
+        this.simpleWall = new Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
     }
 
 
@@ -185,17 +128,13 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
     @Override
     public Node GetDrowableElement() {
         Group parent = new Group();
-        quadCurve.setOnMousePressed(OnMousePressedEventHandler);
-        quadCurve.setOnMouseDragged(OnMouseDraggedEventHandler);
-        quadCurve.setOnMouseReleased(OnMouseReleasedEventHandler);
+        simpleWall.setOnMousePressed(OnMousePressedEventHandler);
+        simpleWall.setOnMouseDragged(OnMouseDraggedEventHandler);
+        simpleWall.setOnMouseReleased(OnMouseReleasedEventHandler);
+        simpleWall.setStrokeWidth(3);
 
         if (HouseProject.getInstance().getSelectedItem() != null) {
             if (HouseProject.getInstance().getSelectedItem().getGraphModel().GetId() == this.GetId()) {
-
-                this.quadCurve.setStrokeWidth(3);
-                this.quadCurve.setStroke(Color.BLACK);
-                this.quadCurve.setFill(Color.TRANSPARENT);
-
                 startPointShape.setRadius(5);
                 startPointShape.setFill(Color.CADETBLUE);
                 startPointShape.setStrokeWidth(2);
@@ -209,28 +148,15 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                 endPointShape.setOnMousePressed(OnMousePressedEventHandler);
                 endPointShape.setOnMouseDragged(OnMouseDraggedEventHandler);
                 endPointShape.setOnMouseReleased(OnMouseReleasedEventHandler);
-
-                controlPointShape.setRadius(5);
-                controlPointShape.setFill(Color.CADETBLUE);
-                controlPointShape.setStrokeWidth(2);
-                controlPointShape.setOnMousePressed(OnMousePressedEventHandler);
-                controlPointShape.setOnMouseDragged(OnMouseDraggedEventHandler);
-                controlPointShape.setOnMouseReleased(OnMouseReleasedEventHandler);
-            }
-            else {
-                this.quadCurve.setStrokeWidth(3);
-                this.quadCurve.setStroke(Color.BLACK);
-                this.quadCurve.setFill(Color.TRANSPARENT);
+            } else {
                 startPointShape.setRadius(0);
                 endPointShape.setRadius(0);
-                controlPointShape.setRadius(0);
             }
         }
 
-        parent.getChildren().add(quadCurve);
+        parent.getChildren().add(simpleWall);
         parent.getChildren().add(startPointShape);
         parent.getChildren().add(endPointShape);
-        parent.getChildren().add(controlPointShape);
         return parent;
     }
 
@@ -254,8 +180,6 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point_1 Y", String.valueOf(this.getStartY()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point_2 X", String.valueOf(this.getEndX()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point_2 Y", String.valueOf(this.getEndY()), provider));
-        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("control X", String.valueOf(this.getControlX()), provider));
-        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("control Y", String.valueOf(this.getControlY()), provider));
         return new NodeModelContainer(resultContainer, this, this);
     }
 
@@ -266,9 +190,12 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point_1 Y", String.valueOf(this.getStartY()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point_2 X", String.valueOf(this.getEndX()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point_2 Y", String.valueOf(this.getEndY()), provider));
-        resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("control X", String.valueOf(this.getControlX()), provider));
-        resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("control Y", String.valueOf(this.getControlY()), provider));
         return new NodeModelContainer(resultContainer, this, this);
+    }
+
+    @Override
+    public NodeModelContainer getGraphPropertyNode() {
+        return null;
     }
 
     @Override
@@ -276,27 +203,16 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         if (isBeengChanged) {
             date = new GregorianCalendar();
             lastChange = "last change: " + date.getTime().toString().substring(0, 19);
-            return "Curve (" + lastChange + ")";
-        } else return "Curve";
+            return "Wall (" + lastChange + ")";
+        } else return "Wall";
     }
 
-    @Override
-    public void setPropertiesFromModalWindow(String key, Object value) {
-
-    }
-
-    @Override
-    public Object getPropertyToModalWindow(String key) {
-        return null;
-    }
 
     @Override
     public void getPropertiesFromNode(VBox vBox) {
         isBeengChanged = true;
 
-        double x1 = startPoint.getX(), y1 = startPoint.getY();
-        double x2 = endPoint.getX(), y2 = endPoint.getY();
-        double control_x = controlPoint.getX(), control_y = controlPoint.getY();
+        double x1 = startPoint.getX(), y1 = startPoint.getY(), x2 = endPoint.getX(), y2 = endPoint.getY();
 
         //по свойствам
         for (Node node : vBox.getChildren()) {
@@ -319,18 +235,11 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                         case "point_2 Y":
                             y2 = Double.valueOf(text.getText());
                             break;
-                        case "control X":
-                            control_x = Double.valueOf(text.getText());
-                            break;
-                        case "control Y":
-                            control_y = Double.valueOf(text.getText());
-                            break;
                     }
                     break;
                 }
             }
         }
-        this.setControlPoint(new Point2D.Double(control_x, control_y));
         this.setStartPoint(new Point2D.Double(x1, y1));
         this.setEndPoint(new Point2D.Double(x2, y2));
 
@@ -341,8 +250,31 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         return "x1=" + startPoint.getX() + " y1=" + startPoint.getY() + ", x2=" + endPoint.getX() + " y2=" + endPoint.getY();
     }
 
+    @Override
+    public void setPropertiesFromModalWindow(String key, Object value) {
 
-    private final EventHandler<MouseEvent> OnMousePressedEventHandler = new EventHandler<MouseEvent>() {
+    }
+
+    @Override
+    public Object getPropertyToModalWindow(String key) {
+        return null;
+    }
+
+    @Override
+    public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
+        //////////////////////////////////////////errors
+        if(this.startPoint.getX() < 0 || this.startPoint.getY() < 0)
+            messageMap.put("00010", "Wall start point contains coords < 0");
+        if(this.endPoint.getX() < 0 || this.endPoint.getY() < 0)
+            messageMap.put("00011", "Wall end point contains coords < 0");
+
+
+        //////////////////////////////////////////warnings
+
+        return messageMap;
+    }
+
+    private EventHandler<MouseEvent> OnMousePressedEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent t) {
             orgSceneX = t.getSceneX();
@@ -352,7 +284,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                 orgTranslateX = circle.getCenterX();
                 orgTranslateY = circle.getCenterY();
             }
-            if (t.getSource() instanceof QuadCurve) {
+            if (t.getSource() instanceof Line) {
                 Node p = ((Node) (t.getSource()));
                 orgTranslateX = p.getTranslateX();
                 orgTranslateY = p.getTranslateY();
@@ -362,7 +294,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         }
     };
 
-    private final EventHandler<MouseEvent> OnMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
+    private EventHandler<MouseEvent> OnMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent t) {
             double offsetX = t.getSceneX() - orgSceneX;
@@ -382,7 +314,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         }
     };
 
-    private final EventHandler<MouseEvent> OnMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
+    private EventHandler<MouseEvent> OnMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent t) {
             double offsetX = t.getSceneX() - orgSceneX;
@@ -394,7 +326,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                 //если (новые коорды - сдвиг - положение стартовой точки) меньше единицы (поправка на округление),
                 //то считаем что распознали точку
                 if (Math.abs((newTranslateX - offsetX) - startPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY) - startPoint.getY()) < 1) {
-                    if (WorkbenchProperties.getInstance().isControlDotsConnecting()) {
+                    if ((boolean)WorkbenchProperties.getInstance().getPropertyByName("isCDConnecting")) {
                         String selectedLevelName = EventContextController.getWorkbenchProvider().getSelectedLevelName();
                         int levelIndex = HouseProject.getInstance().getBuilding().getIndexLevelWithName(selectedLevelName);
                         ArrayList<Point2D> points = HouseProject.getInstance().getBuilding().getLevels().get(levelIndex).GetPointsToConnect();
@@ -409,7 +341,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                             distY = Math.abs(newTranslateY - point.getY());
                             distSelfParePointX = Math.abs(newTranslateX - endPoint.getX());
                             distSelfParePointY = Math.abs(newTranslateY - endPoint.getY());
-                            connectRadius = WorkbenchProperties.getInstance().getControlDotsConnectingRadius();
+                            connectRadius = (int)WorkbenchProperties.getInstance().getPropertyByName("CDConnectRadius");
                             if (distX <= connectRadius && distSelfParePointX > connectRadius
                                     && distY <= connectRadius && distSelfParePointY > connectRadius) {
                                 newTranslateX = point.getX();
@@ -417,11 +349,13 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                                 break;
                             }
                         }
+
                     }
                     setStartPoint(newTranslateX, newTranslateY);
+
                 }
                 if (Math.abs((newTranslateX - offsetX) - endPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY) - endPoint.getY()) < 1) {
-                    if (WorkbenchProperties.getInstance().isControlDotsConnecting()) {
+                    if ((boolean)WorkbenchProperties.getInstance().getPropertyByName("isCDConnecting")) {
                         String selectedLevelName = EventContextController.getWorkbenchProvider().getSelectedLevelName();
                         int levelIndex = HouseProject.getInstance().getBuilding().getIndexLevelWithName(selectedLevelName);
                         ArrayList<Point2D> points = HouseProject.getInstance().getBuilding().getLevels().get(levelIndex).GetPointsToConnect();
@@ -436,7 +370,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                             distY = Math.abs(newTranslateY - point.getY());
                             distSelfParePointX = Math.abs(newTranslateX - startPoint.getX());
                             distSelfParePointY = Math.abs(newTranslateY - startPoint.getY());
-                            connectRadius = WorkbenchProperties.getInstance().getControlDotsConnectingRadius();
+                            connectRadius = (int)WorkbenchProperties.getInstance().getPropertyByName("CDConnectRadius");
                             if (distX <= connectRadius && distSelfParePointX > connectRadius
                                     && distY <= connectRadius && distSelfParePointY > connectRadius) {
                                 newTranslateX = point.getX();
@@ -444,18 +378,16 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                                 break;
                             }
                         }
+
                     }
                     setEndPoint(newTranslateX, newTranslateY);
                 }
-                if(Math.abs((newTranslateX - offsetX)-controlPoint.getX()) < 1 && Math.abs((newTranslateY - offsetY)-controlPoint.getY()) < 1){
-                    setControlPoint(newTranslateX,newTranslateY);
-                }
+
             }
-            if (t.getSource() instanceof QuadCurve) {
+            if (t.getSource() instanceof Line) {
                 {
                     setStartPoint(new Point2D.Double(getStartX() + offsetX, getStartY() + offsetY));
                     setEndPoint(new Point2D.Double(getEndX() + offsetX, getEndY() + offsetY));
-                    setControlPoint(new Point2D.Double(getControlX() + offsetX, getControlY() + offsetY));
                     NodeModelContainer container = GetContainer();
                     HouseProject.getInstance().setSelectedItem(container);
 
@@ -466,5 +398,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
     };
 
 
-
 }
+
+
+

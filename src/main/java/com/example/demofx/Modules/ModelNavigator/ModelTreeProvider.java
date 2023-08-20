@@ -1,25 +1,19 @@
 package com.example.demofx.Modules.ModelNavigator;
 
 import com.example.demofx.Interfaces.IPropertyChangeble;
-import com.example.demofx.Models.*;
+import com.example.demofx.Models.Basic.*;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Dialogs.TextPropertyDialog;
 import com.example.demofx.Utils.Enums.DescriptionTypes;
 import com.example.demofx.Utils.Events.EventContextController;
-import com.sun.source.tree.Tree;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Currency;
-import java.util.Map;
 import java.util.Optional;
 
 public class ModelTreeProvider implements PropertyChangeListener {
@@ -42,6 +36,7 @@ public class ModelTreeProvider implements PropertyChangeListener {
     private void modelTreeInitialize() {
         TreeItemContainer<String> root = new TreeItemContainer<String>
                 (HouseProject.getInstance().getBuilding().getName(), HouseProject.getInstance().getBuilding());
+
 
         // по этажам
         //for (Map.Entry lev : HouseProject.getInstance().getBuilding().getLevels().entrySet()) {
@@ -163,10 +158,11 @@ public class ModelTreeProvider implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        NodeModelContainer container;
         switch (propertyChangeEvent.getPropertyName()) {
             case "reRender":
                 if(propertyChangeEvent.getNewValue() != null && propertyChangeEvent.getNewValue().getClass() == NodeModelContainer.class) {
-                    NodeModelContainer container = (NodeModelContainer) propertyChangeEvent.getNewValue();
+                    container = (NodeModelContainer) propertyChangeEvent.getNewValue();
                     ChangeableItem = container.getPropertyModel();
                     PropertyView.getChildren().clear();
                     PropertyView.getChildren().add(ChangeableItem.getTreePropertyNode(this).getPropertyNode());
@@ -174,14 +170,21 @@ public class ModelTreeProvider implements PropertyChangeListener {
                 modelTreeInitialize();
                 break;
             case "newSelectedItemOnWorkbench":
-                NodeModelContainer container = (NodeModelContainer) propertyChangeEvent.getNewValue();
+                container = (NodeModelContainer) propertyChangeEvent.getNewValue();
                 HouseProject.getInstance().setSelectedItem(container);
                 ChangeableItem = container.getPropertyModel();
                 PropertyView.getChildren().clear();
-                PropertyView.getChildren().add(ChangeableItem.getWorkbenchPropertyNode(this).getPropertyNode());
-
+                PropertyView.getChildren().add(ChangeableItem.getTreePropertyNode(this).getPropertyNode());
                 break;
-
+            case "drawWayPointsGraph":
+                container = (NodeModelContainer) propertyChangeEvent.getNewValue();
+                if(container != null) {
+                    HouseProject.getInstance().setSelectedItem(container);
+                    ChangeableItem = container.getPropertyModel();
+                    PropertyView.getChildren().clear();
+                    PropertyView.getChildren().add(ChangeableItem.getGraphPropertyNode().getPropertyNode());
+                }
+                break;
             default:
                 break;
         }

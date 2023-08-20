@@ -1,12 +1,9 @@
 package com.example.demofx.Utils.Aggregators;
 
-import com.example.demofx.Models.HouseProject;
-import com.example.demofx.Models.Level;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class LevelButtonsAggregator {
 

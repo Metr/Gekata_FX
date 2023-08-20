@@ -1,4 +1,4 @@
-package com.example.demofx.Models;
+package com.example.demofx.Models.Basic;
 
 import com.example.demofx.Interfaces.IGraphPrimitive;
 import com.example.demofx.Interfaces.IPropertyChangeble;
@@ -12,6 +12,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -19,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
 
@@ -26,15 +28,16 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
 
     //model variables
     private String ItemId;
+
+    private String Name;
+
     private double x_pos;
     private double y_pos;
     private double radius;
 
     private String fromLevelId;
 
-    private String toLevelId;
-
-
+    private WayPoint finishWayPoint;
     // data variables
 
 
@@ -42,6 +45,8 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
 
     private Circle wayPointItemShape;
     private Circle wayPointRadiusShape;
+
+    private Point2D graphPoint;
 
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
@@ -53,9 +58,11 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         this.radius = radius;
 
         this.fromLevelId = fromLevelId;
-        this.toLevelId = "";
+//        this.toLevelId = "";
+//        this.toWayPointId = "";
 
         this.ItemId = UUID.randomUUID().toString();
+        this.Name = "no name waypoint " + this.ItemId;
 
         this.wayPointItemShape = new Circle(x_pos, y_pos, 10);
         wayPointItemShape.setStrokeWidth(3);
@@ -69,6 +76,18 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         wayPointRadiusShape.setStrokeWidth(2);
         wayPointRadiusShape.setOpacity(0.9);
 
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public String getFromLevelId() {
+        return fromLevelId;
     }
 
     @Override
@@ -106,10 +125,51 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         ItemId = itemId;
     }
 
+    public WayPoint getFinishWayPoint() {
+        return finishWayPoint;
+    }
+
+    public void setFinishWayPoint(WayPoint finishWayPoint) {
+        this.finishWayPoint = finishWayPoint;
+    }
+
+    public Point2D getGraphPoint() {
+        return graphPoint;
+    }
+
     @Override
     public ArrayList<Point2D> GetPointsToConnect() {
         return null;
     }
+
+    public Node GetDrowableGraphElementAt(double x, double y) {
+        Group parent = new Group();
+
+        this.graphPoint = new Point2D.Double(x, y);
+
+        Circle circle = new Circle();
+        circle.setCenterX(graphPoint.getX());
+        circle.setCenterY(graphPoint.getY());
+        circle.setOnMousePressed(OnMousePressedOnGraphItemEventHandler);
+        circle.setRadius(15);
+        circle.setFill(Color.CYAN);
+        circle.setStrokeWidth(2);
+        circle.setStroke(Color.BLACK);
+
+        javafx.scene.control.Label label = new Label(this.Name);
+        label.setTranslateX(x + 15);
+        label.setTranslateY(y - 20);
+
+        if (finishWayPoint == null) {
+            circle.setFill(Color.RED);
+        }
+
+
+        parent.getChildren().add(circle);
+        parent.getChildren().add(label);
+        return parent;
+    }
+
 
     @Override
     public Node GetDrowableElement() {
@@ -149,7 +209,7 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
             }
 
             //if radius visible is ON
-            if(WorkbenchProperties.getInstance().isAllRadiusDrawing()){
+            if ((boolean) WorkbenchProperties.getInstance().getPropertyByName("isAllRadiusDraw")) {
                 wayPointItemShape.setFill(Color.CYAN);
 
                 wayPointRadiusShape.setRadius(radius);
@@ -157,6 +217,16 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
                 wayPointRadiusShape.setOpacity(0.3);
             }
 
+            if ((boolean) WorkbenchProperties.getInstance().getPropertyByName("isWayPointsNamed")) {
+                Label label = new Label(this.Name);
+                label.setTranslateX(this.x_pos + 14);
+                label.setTranslateY(this.y_pos - 14);
+                parent.getChildren().add(label);
+            }
+
+            if (finishWayPoint == null) {
+                wayPointItemShape.setFill(Color.RED);
+            }
         }
 
         parent.getChildren().add(wayPointRadiusShape);
@@ -180,18 +250,20 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     @Override
     public NodeModelContainer getTreePropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
+        resultContainer.getChildren().add(PropertyItemGenerator.
+                generateTreeRedrawOnUnFocusPropertyControl("name", this.Name, provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point X", String.valueOf(this.getX()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point Y", String.valueOf(this.getY()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("trust radius", String.valueOf(this.getRadius()), provider));
-        if (Objects.equals(this.toLevelId, ""))
-            resultContainer.getChildren().add(PropertyItemGenerator.generateTreePropertyListControl("go to level"
+        if (finishWayPoint == null)
+            resultContainer.getChildren().add(PropertyItemGenerator.generateTreePropertyListControl("go to point"
                     , "NaN"
-                    , HouseProject.getInstance().getBuilding().getIdNameLevels()
+                    , HouseProject.getInstance().getBuilding().getIdNameWaypoints()
                     , provider));
         else
-            resultContainer.getChildren().add(PropertyItemGenerator.generateTreePropertyListControl("go to level"
-                    , HouseProject.getInstance().getBuilding().getLevelNameWithId(this.toLevelId)
-                    , HouseProject.getInstance().getBuilding().getIdNameLevels()
+            resultContainer.getChildren().add(PropertyItemGenerator.generateTreePropertyListControl("go to point"
+                    , finishWayPoint.getName()
+                    , HouseProject.getInstance().getBuilding().getIdNameWaypoints()
                     , provider));
         return new NodeModelContainer(resultContainer, this, this);
     }
@@ -199,28 +271,33 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     @Override
     public NodeModelContainer getWorkbenchPropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
-        resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point X", String.valueOf(this.getX()), provider));
-        resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point Y", String.valueOf(this.getY()), provider));
-        resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("trust radius", String.valueOf(this.getRadius()), provider));
-        resultContainer.getChildren().add(PropertyItemGenerator.generateTreePropertyListControl("go to level"
-                , HouseProject.getInstance().getBuilding().getLevelNameWithId(this.fromLevelId)
-                , HouseProject.getInstance().getBuilding().getIdNameLevels()
-                , provider));
+        return new NodeModelContainer(resultContainer, this, this);
+    }
+
+    public NodeModelContainer getGraphPropertyNode() {
+        VBox resultContainer = new VBox();
+        resultContainer.getChildren().add(PropertyItemGenerator.generateGraphRedrawOnChangePropertyControl("name", this.Name, EventContextController.getModelTreeProvider()));
+        if (finishWayPoint == null)
+            resultContainer.getChildren().add(PropertyItemGenerator.generateGraphPropertyListControl("go to point"
+                    , "NaN"
+                    , HouseProject.getInstance().getBuilding().getIdNameWaypoints()
+                    , EventContextController.getModelTreeProvider()));
+        else
+            resultContainer.getChildren().add(PropertyItemGenerator.generateGraphPropertyListControl("go to point"
+                    , finishWayPoint.getName()
+                    , HouseProject.getInstance().getBuilding().getIdNameWaypoints()
+                    , EventContextController.getModelTreeProvider()));
         return new NodeModelContainer(resultContainer, this, this);
     }
 
     @Override
     public String getTreeItemName() {
-        String from, to;
-        from = "" + HouseProject.getInstance().getBuilding().getLevelNameWithId(fromLevelId);
-        to = "" + HouseProject.getInstance().getBuilding().getLevelNameWithId(toLevelId);
-        return "go to " + to + " from " + from;
+        return this.Name;
+
     }
 
     @Override
-    public void setPropertiesFromModalWindow(String key, Object value) {
-
-    }
+    public void setPropertiesFromModalWindow(String key, Object value) {    }
 
     @Override
     public Object getPropertyToModalWindow(String key) {
@@ -239,7 +316,11 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
                     if (subNode.getClass() == TextField.class) {
                         TextField text = (TextField) subNode;
                         switch (text.getId()) {
+                            case "name":
+                                this.Name = text.getText();
+                                break;
                             case "point X":
+                                //TODO check text value
                                 this.x_pos = Double.valueOf(text.getText());
                                 break;
                             case "point Y":
@@ -256,12 +337,12 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
                     if (subNode.getClass() == ChoiceBox.class) {
                         ChoiceBox<String> choiceBox = (ChoiceBox<String>) subNode;
                         String value = choiceBox.getValue();
-                        HashMap<String, String> levelsMap = HouseProject.getInstance().getBuilding().getIdNameLevels();
-                        if (levelsMap.containsValue(value)) {
-                            Set<String> keys = levelsMap.keySet();
+                        HashMap<String, String> waypointMap = HouseProject.getInstance().getBuilding().getIdNameWaypoints();
+                        if (waypointMap.containsValue(value)) {
+                            Set<String> keys = waypointMap.keySet();
                             for (String key : keys)
-                                if (levelsMap.get(key).toString().equals(value))
-                                    this.toLevelId = key;
+                                if (waypointMap.get(key).equals(value))
+                                    this.finishWayPoint = HouseProject.getInstance().getBuilding().getWayPointWithId(key);
                         }
 
                     }
@@ -269,7 +350,29 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
                 }
             }
         }
-        System.out.println(this.toLevelId);
+        //System.out.println(this.toLevelId);
+    }
+
+    @Override
+    public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
+
+        //////////////////////////////////////////errors
+        if(this.Name.isEmpty())
+            messageMap.put("00004", "Way Point name in empty or null");
+        if(this.x_pos <= 0 || this.y_pos <= 0)
+            messageMap.put("00005", "Way Point \'" + this.Name + "\' pos_x or/and pos_y <= 0");
+        if(this.radius <= 0)
+            messageMap.put("00006", "Way Point \'" + this.Name + "\' radius <= 0");
+
+
+        //////////////////////////////////////////warnings
+        if(this.finishWayPoint == null)
+            messageMap.put("10002", "Way Point \'" + this.Name + "\' dont connected with any Way Point");
+
+
+
+
+        return messageMap;
     }
 
     private final EventHandler<MouseEvent> OnMousePressedEventHandler = new EventHandler<MouseEvent>() {
@@ -284,8 +387,18 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
 
                 NodeModelContainer container = GetContainer();
                 HouseProject.getInstance().setSelectedItem(container);
+//                EventContextController.getTopMenuProvider().BroadcastDrawWayPointsGraphCommand();
             }
 
+        }
+    };
+
+    private final EventHandler<MouseEvent> OnMousePressedOnGraphItemEventHandler = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent t) {
+            NodeModelContainer container = GetContainer();
+            HouseProject.getInstance().setSelectedItem(container);
+            EventContextController.getTopMenuProvider().BroadcastDrawWayPointsGraphCommand(container);
         }
     };
 

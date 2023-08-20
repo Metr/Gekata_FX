@@ -18,6 +18,8 @@ public class WorkbenchPropertyDialog {
 
     private CheckBox radiusVisibilityBox;
 
+    private CheckBox namesVisibilityBox;
+
     private CheckBox controlDotsConnectedBox;
 
     private TextField dotsConnectingRadiusField;
@@ -51,10 +53,21 @@ public class WorkbenchPropertyDialog {
         RadiusDrawContainer.getChildren().add(labelRadius);
 
         radiusVisibilityBox = new CheckBox();
-        radiusVisibilityBox.setSelected(WorkbenchProperties.getInstance().isAllRadiusDrawing());
+        radiusVisibilityBox.setSelected((boolean)WorkbenchProperties.getInstance().getPropertyByName("isAllRadiusDraw"));
         RadiusDrawContainer.getChildren().add(radiusVisibilityBox);
         verticalContainer.getChildren().add(RadiusDrawContainer);
 
+        //is dot names draw
+
+        HBox NameDrawContainer = new HBox(2);
+
+        Label nameRadius = new Label("Drawing Points \"name\" property");
+        NameDrawContainer.getChildren().add(nameRadius);
+
+        namesVisibilityBox = new CheckBox();
+        namesVisibilityBox.setSelected((boolean)WorkbenchProperties.getInstance().getPropertyByName("isWayPointsNamed"));
+        NameDrawContainer.getChildren().add(namesVisibilityBox);
+        verticalContainer.getChildren().add(NameDrawContainer);
 
         //control dots connecting
 
@@ -63,7 +76,7 @@ public class WorkbenchPropertyDialog {
         ConnectingDotsContainer.getChildren().add(labelDots);
 
         controlDotsConnectedBox = new CheckBox();
-        controlDotsConnectedBox.setSelected(WorkbenchProperties.getInstance().isControlDotsConnecting());
+        controlDotsConnectedBox.setSelected((boolean)WorkbenchProperties.getInstance().getPropertyByName("isCDConnecting"));
         controlDotsConnectedBox.setOnAction(event -> {
             dotsConnectingRadiusField.setDisable(!dotsConnectingRadiusField.isDisabled());
         });
@@ -75,8 +88,8 @@ public class WorkbenchPropertyDialog {
         ConnectingDotsRadiusContainer.getChildren().add(labelRadiusDots);
 
         dotsConnectingRadiusField = new TextField();
-        dotsConnectingRadiusField.setText("" + WorkbenchProperties.getInstance().getControlDotsConnectingRadius());
-        dotsConnectingRadiusField.setDisable(!WorkbenchProperties.getInstance().isControlDotsConnecting());
+        dotsConnectingRadiusField.setText("" + (int)WorkbenchProperties.getInstance().getPropertyByName("CDConnectRadius"));
+        dotsConnectingRadiusField.setDisable(!(boolean)WorkbenchProperties.getInstance().getPropertyByName("isCDConnecting"));
         ConnectingDotsRadiusContainer.getChildren().add(dotsConnectingRadiusField);
         verticalContainer.getChildren().add(ConnectingDotsRadiusContainer);
 
@@ -104,9 +117,10 @@ public class WorkbenchPropertyDialog {
 
     private boolean trySetWorkbenchProperties() {
         try {
-            WorkbenchProperties.getInstance().setAllRadiusDrawing(this.radiusVisibilityBox.isSelected());
-            WorkbenchProperties.getInstance().setControlDotsConnecting(this.controlDotsConnectedBox.isSelected());
-            WorkbenchProperties.getInstance().setControlDotsConnectingRadius(Integer.parseInt(this.dotsConnectingRadiusField.getText()));
+            WorkbenchProperties.getInstance().changeProperty("isAllRadiusDraw", this.radiusVisibilityBox.isSelected());
+            WorkbenchProperties.getInstance().changeProperty("isCDConnecting", this.controlDotsConnectedBox.isSelected());
+            WorkbenchProperties.getInstance().changeProperty("CDConnectRadius",Integer.parseInt(this.dotsConnectingRadiusField.getText()));
+            WorkbenchProperties.getInstance().changeProperty("isWayPointsNamed", this.namesVisibilityBox.isSelected());
             return true;
         } catch (Exception ex) {
 

@@ -1,6 +1,6 @@
 package com.example.demofx;
 
-import com.example.demofx.Models.HouseProject;
+import com.example.demofx.Models.Basic.HouseProject;
 import com.example.demofx.Modules.ItemList.ItemListProvider;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Modules.TopMenu.TopMenuProvider;
@@ -94,12 +94,12 @@ public class Controller {
 
     //TODO local
     //Header menu
-    //  -Radius visibility+
-    //  -Control dots trust-radius connect+
+    //  +Radius visibility+
+    //  +Control dots trust-radius connect+
     //  -create/save/select file project
     //      -transport model
     //      -
-    //  -level graph analyse
+    //  +level graph analyse
     //Upload image to level
     //
 

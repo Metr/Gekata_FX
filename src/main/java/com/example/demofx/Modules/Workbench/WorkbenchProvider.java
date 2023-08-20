@@ -1,19 +1,11 @@
 package com.example.demofx.Modules.Workbench;
 
-import com.example.demofx.Interfaces.IGraphPrimitive;
-import com.example.demofx.Models.HouseProject;
-import com.example.demofx.Utils.Containers.NodeModelContainer;
-import com.example.demofx.Utils.MouseGestures;
+import com.example.demofx.Models.Basic.HouseProject;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.List;
 
 public class WorkbenchProvider implements PropertyChangeListener {
 
@@ -43,6 +35,27 @@ public class WorkbenchProvider implements PropertyChangeListener {
         }
     }
 
+    public void DrawLevelsGraph(){
+     if(HouseProject.getInstance().getBuilding().getLevels().size() >= 2){
+         MainCanvas.getChildren().clear();
+         MainCanvas.getChildren().add(HouseProject.getInstance().getBuilding().GetLevelsGraphNode());
+     }
+     else {
+         //TODO alert window
+         System.out.println("levels.count < 2");
+     }
+    }
+
+    private void DrawWaypointGraph(){
+        if(!HouseProject.getInstance().getBuilding().getLevels().isEmpty()){
+            MainCanvas.getChildren().clear();
+            MainCanvas.getChildren().add(HouseProject.getInstance().getBuilding().GetWaypointsGraphNode());
+        }
+        else {
+            //TODO alert window
+            System.out.println("levels.count < 2");
+        }
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +68,12 @@ public class WorkbenchProvider implements PropertyChangeListener {
             case "reRender":
                 DrawLevel(selectedLevelName);
                 break;
-
+            case "drawLevelGraph":
+                DrawLevelsGraph();
+                break;
+            case "drawWayPointsGraph":
+                DrawWaypointGraph();
+                break;
             default:
                 break;
         }

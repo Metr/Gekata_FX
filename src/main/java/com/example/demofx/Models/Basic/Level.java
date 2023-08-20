@@ -1,4 +1,4 @@
-package com.example.demofx.Models;
+package com.example.demofx.Models.Basic;
 
 import com.example.demofx.Interfaces.IGraphPrimitive;
 import com.example.demofx.Interfaces.IPropertyChangeble;
@@ -8,13 +8,17 @@ import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.SortedMap;
 import java.util.UUID;
 
 public class Level implements IPropertyChangeble, IGraphPrimitive {
@@ -30,6 +34,11 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     private ArrayList<IGraphPrimitive> InterestPoints;
     private String Name;
 
+    ///VIEW_DATA////////////////////////////
+
+    Circle levelShape;
+    Label levelNameLabel;
+
     public Level() {
         this.Name = "unknown level " + HouseProject.getInstance().getBuilding().getLevels().size();
         this.Walls = new ArrayList<IGraphPrimitive>();
@@ -43,6 +52,8 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     public Level(String name) {
         this.ItemId = UUID.randomUUID().toString();
         this.Name = name;
+        this.levelShape = new Circle();
+        this.levelNameLabel = new Label(this.Name);
         this.Walls = new ArrayList<IGraphPrimitive>();
         this.CurveWalls = new ArrayList<IGraphPrimitive>();
         this.WayPoints = new ArrayList<IGraphPrimitive>();
@@ -98,6 +109,15 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
         return WayPoints;
     }
 
+    public ArrayList<WayPoint> getWayPointsToGraph(){
+        ArrayList<WayPoint> result = new ArrayList<>();
+
+        for(int i = 0; i < WayPoints.size(); i++)
+            result.add((WayPoint) WayPoints.get(i));
+
+        return result;
+    }
+
     public void setWayPoints(ArrayList<IGraphPrimitive> wayPoints) {
         WayPoints = wayPoints;
     }
@@ -116,6 +136,28 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
 
     public void setInterestPoints(ArrayList<IGraphPrimitive> interestPoints) {
         InterestPoints = interestPoints;
+    }
+
+    public Circle getLevelShape() {
+        return levelShape;
+    }
+
+    @Override
+    public NodeModelContainer getGraphPropertyNode() {
+        return null;
+    }
+
+    public void setLevelShape(double x, double y) {
+        this.levelShape.setCenterX(x);
+        this.levelShape.setCenterY(y);
+    }
+
+    public Label getLevelNameLabel() {
+        return levelNameLabel;
+    }
+
+    public void setLevelNameLabel(String newName) {
+        this.levelNameLabel.setText(newName);
     }
 
     @Override
@@ -186,6 +228,19 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     @Override
     public Node GetDrowableElement() {
         Group parent = new Group();
+
+        levelShape.setFill(Color.AQUA);
+        levelShape.setStroke(Color.BLACK);
+        levelShape.setOpacity(0.5);
+        levelShape.setStrokeWidth(3);
+        levelShape.setRadius(20);
+
+        levelNameLabel.setText(this.Name);
+        levelNameLabel.setTranslateX(levelShape.getCenterX()+22);
+        levelNameLabel.setTranslateY(levelShape.getCenterY()-22);
+
+        parent.getChildren().add(levelShape);
+        parent.getChildren().add(levelNameLabel);
         return parent;
     }
 
@@ -195,6 +250,37 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
                 this.getTreePropertyNode(EventContextController.getModelTreeProvider()).getPropertyNode(),
                 this, this);
         return container;
+    }
+
+    @Override
+    public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
+
+        //////////////////////////////////////////errors
+        if(this.Name.isEmpty())
+            messageMap.put("00003", "level name in empty or null");
+        if(this.WayPoints.isEmpty())
+            messageMap.put("00004", "level \'" + this.Name + "\' dont contains any Way Point object");
+        if(this.Walls.isEmpty() && this.CurveWalls.isEmpty())
+            messageMap.put("00005", "level \'" + this.Name + "\' dont contains any Wall object");
+
+
+        //////////////////////////////////////////warnings
+        if(this.InterestPoints.isEmpty())
+            messageMap.put("10001", "level \'" + this.Name + "\' dont contains any Interest Point object");
+
+
+        //////////////////////////////////////////inner model objects
+        for(IGraphPrimitive point : WayPoints)
+            point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
+        for(IGraphPrimitive point : InterestPoints)
+            point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
+        for(IGraphPrimitive point : Walls)
+            point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
+        for(IGraphPrimitive point : CurveWalls)
+            point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
+
+
+        return messageMap;
     }
 
     @Override

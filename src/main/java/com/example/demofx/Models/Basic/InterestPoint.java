@@ -1,4 +1,4 @@
-package com.example.demofx.Models;
+package com.example.demofx.Models.Basic;
 
 import com.example.demofx.Interfaces.IGraphPrimitive;
 import com.example.demofx.Interfaces.IInterestSpot;
@@ -7,12 +7,15 @@ import com.example.demofx.Interfaces.ISpecialSpot;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
+import com.example.demofx.Utils.Enums.DescriptionTypes;
+import com.example.demofx.Utils.Enums.EnumUtils;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -31,9 +34,8 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
     private double radius;
 
     private String description;
-
     private String objectName;
-
+    private DescriptionTypes contentType;
 
     //visualisation variables
 
@@ -50,6 +52,7 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 
         this.description = "";
         this.objectName = "unknown object";
+        this.contentType = DescriptionTypes.TEXT_DESCR;
 
         this.ItemId = UUID.randomUUID().toString();
 
@@ -84,6 +87,15 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 
     public void setRadius(double radius) {
         this.radius = radius;
+    }
+
+
+    public DescriptionTypes getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(DescriptionTypes contentType) {
+        this.contentType = contentType;
     }
 
     public void setX_pos(double x_pos) {
@@ -146,13 +158,20 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
             }
 
             //if radius visible is ON
-            if(WorkbenchProperties.getInstance().isAllRadiusDrawing()){
+            if ((boolean) WorkbenchProperties.getInstance().getPropertyByName("isAllRadiusDraw")) {
                 wayPointItemShape.setFill(Color.LIME);
 
                 wayPointRadiusShape.setRadius(radius);
                 wayPointRadiusShape.setFill(Color.LIME);
                 wayPointRadiusShape.setStroke(Color.BLACK);
                 wayPointRadiusShape.setOpacity(0.3);
+            }
+
+            if ((boolean) WorkbenchProperties.getInstance().getPropertyByName("isWayPointsNamed")) {
+                Label label = new Label(this.objectName);
+                label.setTranslateX(this.x_pos + 14);
+                label.setTranslateY(this.y_pos - 14);
+                parent.getChildren().add(label);
             }
 
         }
@@ -171,6 +190,11 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
     }
 
     @Override
+    public NodeModelContainer getGraphPropertyNode() {
+        return null;
+    }
+
+    @Override
     public String GetId() {
         return this.ItemId;
     }
@@ -183,6 +207,9 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point Y", String.valueOf(this.getY()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("trust radius", String.valueOf(this.getRadius()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateModalWindowControl("content", description, provider));
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeDescrTypesControl("content type"
+                , contentType.name()
+                , provider));
         return new NodeModelContainer(resultContainer, this, this);
     }
 
@@ -204,9 +231,9 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 
     @Override
     public void setPropertiesFromModalWindow(String key, Object value) {
-        switch (key){
+        switch (key) {
             case "descr" -> {
-                this.description = (String)value;
+                this.description = (String) value;
                 break;
             }
             default -> {
@@ -217,7 +244,7 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 
     @Override
     public Object getPropertyToModalWindow(String key) {
-        switch (key){
+        switch (key) {
             case "descr" -> {
                 return this.description;
             }
@@ -225,6 +252,25 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
                 return null;
             }
         }
+    }
+
+    @Override
+    public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
+
+        //////////////////////////////////////////errors
+        if(this.objectName.isEmpty())
+            messageMap.put("00007", "Interest Point name in empty or null");
+        if(this.x_pos <= 0 || this.y_pos <= 0)
+            messageMap.put("00008", "Interest Point \'" + this.objectName + "\' pos_x or/and pos_y <= 0");
+        if(this.radius <= 0)
+            messageMap.put("00009", "Interest Point \'" + this.objectName + "\' radius <= 0");
+
+
+        //////////////////////////////////////////warnings
+        if(this.description.isEmpty())
+            messageMap.put("10003", "Interest Point \'" + this.objectName + "\' description is empty");
+
+        return messageMap;
     }
 
     @Override
@@ -256,12 +302,28 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 //                                break;
                         }
                     }
+                    if (subNode.getClass() == ChoiceBox.class) {
+                        ChoiceBox<String> choiceBox = (ChoiceBox<String>) subNode;
+                        String value = choiceBox.getValue();
+                        switch (value){
+                            case "TEXT_DESCR":
+                                this.contentType = DescriptionTypes.TEXT_DESCR;
+                                break;
+                            case "GRID_DESCR":
+                                this.contentType = DescriptionTypes.GRID_DESCR;
+                                break;
+                            case "CHAT_DESCR":
+                                this.contentType = DescriptionTypes.CHAT_DESCR;
+                                break;
+                            default: break;
+                        }
 
+
+                    }
                     break;
                 }
             }
         }
-        //System.out.println(this.toLevelId);
     }
 
     private final EventHandler<MouseEvent> OnMousePressedEventHandler = new EventHandler<MouseEvent>() {

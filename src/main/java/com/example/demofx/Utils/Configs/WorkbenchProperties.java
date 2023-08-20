@@ -1,12 +1,13 @@
 package com.example.demofx.Utils.Configs;
 
-import com.example.demofx.Models.Building;
-import com.example.demofx.Models.HouseProject;
-import com.example.demofx.Utils.Containers.NodeModelContainer;
+import java.util.HashMap;
+import java.util.Properties;
 
 public class WorkbenchProperties {
 
     private static WorkbenchProperties workbenchProperties;
+
+    private HashMap<String, Object> ProjectProperties;
 
     private boolean isAllRadiusDrawing;
 
@@ -15,9 +16,11 @@ public class WorkbenchProperties {
     private int ControlDotsConnectingRadius;
 
     public WorkbenchProperties() {
-        ControlDotsConnectingRadius = 3;
-        isControlDotsConnecting = false;
-        isAllRadiusDrawing = false;
+        this.ProjectProperties = new HashMap<>();
+        addProperty("isWayPointsNamed", false);
+        addProperty("isAllRadiusDraw", false);
+        addProperty("isCDConnecting", false);
+        addProperty("CDConnectRadius", 14);
     }
 
     public static synchronized WorkbenchProperties getInstance() {
@@ -27,27 +30,20 @@ public class WorkbenchProperties {
         return workbenchProperties;
     }
 
-    public boolean isAllRadiusDrawing() {
-        return isAllRadiusDrawing;
+    public void addProperty(String key, Object value){
+        ProjectProperties.put(key, value);
     }
 
-    public void setAllRadiusDrawing(boolean allRadiusDrawing) {
-        isAllRadiusDrawing = allRadiusDrawing;
+    public Object getPropertyByName(String key){
+        return ProjectProperties.get(key);
     }
 
-    public boolean isControlDotsConnecting() {
-        return isControlDotsConnecting;
+    public boolean changeProperty(String key, Object newValue){
+        if(ProjectProperties.containsKey(key)) {
+            ProjectProperties.put(key, newValue);
+            return true;
+        }
+        return false;
     }
 
-    public void setControlDotsConnecting(boolean controlDotsConnecting) {
-        isControlDotsConnecting = controlDotsConnecting;
-    }
-
-    public int getControlDotsConnectingRadius() {
-        return ControlDotsConnectingRadius;
-    }
-
-    public void setControlDotsConnectingRadius(int controlDotsConnectingRadius) {
-        ControlDotsConnectingRadius = controlDotsConnectingRadius;
-    }
 }

@@ -63,4 +63,8 @@ public class EventContextController {
     public static ModelTreeProvider getModelTreeProvider() {
         return modelTreeProvider;
     }
+
+    public static TopMenuProvider getTopMenuProvider() {
+        return topMenuProvider;
+    }
 }
