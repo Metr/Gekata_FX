@@ -1,5 +1,6 @@
 package com.example.demofx.Models.Basic;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
+import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -46,9 +47,17 @@ public class HouseProject {
         SelectedItem = selectedItem;
     }
 
+
     ///PROJECT FILE////////////////////////////////////////
 
+    public boolean RemoveObjectWithID(String removableID){
+        return building.removeObjectWithId(removableID);
+    }
+
+
     public SortedMap<String, String> CheckErrors(){
+        ErrorCounterFabric.resetCounter();
+
         SortedMap<String,String> report = new TreeMap<>();
         report = this.building.ModelErrorsCheck(report);
 
@@ -58,7 +67,6 @@ public class HouseProject {
             if(key.substring(0, 1).equals("0"))
                 this.isNoErrors = false;
         }
-
         return report;
     }
 

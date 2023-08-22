@@ -9,18 +9,13 @@ public class WorkbenchProperties {
 
     private HashMap<String, Object> ProjectProperties;
 
-    private boolean isAllRadiusDrawing;
-
-    private boolean isControlDotsConnecting;
-
-    private int ControlDotsConnectingRadius;
-
     public WorkbenchProperties() {
         this.ProjectProperties = new HashMap<>();
         addProperty("isWayPointsNamed", false);
         addProperty("isAllRadiusDraw", false);
         addProperty("isCDConnecting", false);
         addProperty("CDConnectRadius", 14);
+        addProperty("BGOpacity", 30);
     }
 
     public static synchronized WorkbenchProperties getInstance() {

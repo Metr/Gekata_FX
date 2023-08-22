@@ -24,6 +24,7 @@ public class WorkbenchPropertyDialog {
 
     private TextField dotsConnectingRadiusField;
 
+    private TextField BGOpacityField;
 
     public WorkbenchPropertyDialog() {
         this.window = GetModalWorkbenchPropertyDialog();
@@ -93,6 +94,16 @@ public class WorkbenchPropertyDialog {
         ConnectingDotsRadiusContainer.getChildren().add(dotsConnectingRadiusField);
         verticalContainer.getChildren().add(ConnectingDotsRadiusContainer);
 
+        //BackGround opacity
+        HBox BGOpacityContainer = new HBox(2);
+        Label BGOpacity = new Label("Background level opacity % [0;100]");
+        BGOpacityContainer.getChildren().add(BGOpacity);
+
+        BGOpacityField = new TextField();
+        BGOpacityField.setText("" + (int) WorkbenchProperties.getInstance().getPropertyByName("BGOpacity"));
+        BGOpacityContainer.getChildren().add(BGOpacityField);
+        verticalContainer.getChildren().add(BGOpacityContainer);
+
         //Final
 
         pane.setCenter(verticalContainer);
@@ -121,6 +132,8 @@ public class WorkbenchPropertyDialog {
             WorkbenchProperties.getInstance().changeProperty("isCDConnecting", this.controlDotsConnectedBox.isSelected());
             WorkbenchProperties.getInstance().changeProperty("CDConnectRadius",Integer.parseInt(this.dotsConnectingRadiusField.getText()));
             WorkbenchProperties.getInstance().changeProperty("isWayPointsNamed", this.namesVisibilityBox.isSelected());
+            WorkbenchProperties.getInstance().changeProperty("BGOpacity", Integer.parseInt(this.BGOpacityField.getText()));
+
             return true;
         } catch (Exception ex) {
 

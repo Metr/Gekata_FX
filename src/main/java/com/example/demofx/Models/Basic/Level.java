@@ -5,18 +5,22 @@ import com.example.demofx.Interfaces.IPropertyChangeble;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
+import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.SortedMap;
 import java.util.UUID;
@@ -36,6 +40,7 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
 
     ///VIEW_DATA////////////////////////////
 
+    String imagePath;
     Circle levelShape;
     Label levelNameLabel;
 
@@ -51,6 +56,7 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
 
     public Level(String name) {
         this.ItemId = UUID.randomUUID().toString();
+        this.imagePath = "";
         this.Name = name;
         this.levelShape = new Circle();
         this.levelNameLabel = new Label(this.Name);
@@ -80,6 +86,13 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
         return pane;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public String getName() {
         return Name;
@@ -109,10 +122,10 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
         return WayPoints;
     }
 
-    public ArrayList<WayPoint> getWayPointsToGraph(){
+    public ArrayList<WayPoint> getWayPointsToGraph() {
         ArrayList<WayPoint> result = new ArrayList<>();
 
-        for(int i = 0; i < WayPoints.size(); i++)
+        for (int i = 0; i < WayPoints.size(); i++)
             result.add((WayPoint) WayPoints.get(i));
 
         return result;
@@ -160,11 +173,28 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
         this.levelNameLabel.setText(newName);
     }
 
+    private void setLevelBackgroundImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        Stage stage = new Stage();
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile != null) {
+            if (selectedFile.canRead()) {
+                this.imagePath = selectedFile.getAbsolutePath();
+                EventContextController.RenderAll();
+            }
+        }
+    }
+
     @Override
     public NodeModelContainer getTreePropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
-        resultContainer.getChildren().add(PropertyItemGenerator.
-                generateTreeRedrawOnUnFocusPropertyControl("name", this.Name, provider));
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("Delete item", event -> HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("Set background", event -> this.setLevelBackgroundImage()));
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnUnFocusPropertyControl("name", this.Name, provider));
         return new NodeModelContainer(resultContainer, this, this);
     }
 
@@ -236,8 +266,8 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
         levelShape.setRadius(20);
 
         levelNameLabel.setText(this.Name);
-        levelNameLabel.setTranslateX(levelShape.getCenterX()+22);
-        levelNameLabel.setTranslateY(levelShape.getCenterY()-22);
+        levelNameLabel.setTranslateX(levelShape.getCenterX() + 22);
+        levelNameLabel.setTranslateY(levelShape.getCenterY() - 22);
 
         parent.getChildren().add(levelShape);
         parent.getChildren().add(levelNameLabel);
@@ -252,35 +282,66 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
         return container;
     }
 
+
     @Override
     public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
 
         //////////////////////////////////////////errors
-        if(this.Name.isEmpty())
-            messageMap.put("00003", "level name in empty or null");
-        if(this.WayPoints.isEmpty())
-            messageMap.put("00004", "level \'" + this.Name + "\' dont contains any Way Point object");
-        if(this.Walls.isEmpty() && this.CurveWalls.isEmpty())
-            messageMap.put("00005", "level \'" + this.Name + "\' dont contains any Wall object");
+        if (this.Name.isEmpty())
+            messageMap.put("00003-" + ErrorCounterFabric.getCounter(), "level name in empty or null");
+        if (this.WayPoints.isEmpty())
+            messageMap.put("00004-" + ErrorCounterFabric.getCounter(), "level \'" + this.Name + "\' dont contains any Way Point object");
+        if (this.Walls.isEmpty() && this.CurveWalls.isEmpty())
+            messageMap.put("00005-" + ErrorCounterFabric.getCounter(), "level \'" + this.Name + "\' dont contains any Wall object");
 
 
         //////////////////////////////////////////warnings
-        if(this.InterestPoints.isEmpty())
-            messageMap.put("10001", "level \'" + this.Name + "\' dont contains any Interest Point object");
+        if (this.InterestPoints.isEmpty())
+            messageMap.put("10001-" + ErrorCounterFabric.getCounter(), "level \'" + this.Name + "\' dont contains any Interest Point object");
 
 
         //////////////////////////////////////////inner model objects
-        for(IGraphPrimitive point : WayPoints)
+        for (IGraphPrimitive point : WayPoints)
             point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
-        for(IGraphPrimitive point : InterestPoints)
+        for (IGraphPrimitive point : InterestPoints)
             point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
-        for(IGraphPrimitive point : Walls)
+        for (IGraphPrimitive point : Walls)
             point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
-        for(IGraphPrimitive point : CurveWalls)
+        for (IGraphPrimitive point : CurveWalls)
             point.GetContainer().getPropertyModel().ModelErrorsCheck(messageMap);
-
 
         return messageMap;
+    }
+
+    @Override
+    public boolean removeObjectWithId(String itemId) {
+        boolean result = false;
+
+        for (int i = 0; i < WayPoints.size(); i++)
+            if (WayPoints.get(i).GetId().equals(itemId)) {
+                WayPoints.remove(i);
+                return true;
+            }
+
+        for (int i = 0; i < InterestPoints.size(); i++)
+            if (InterestPoints.get(i).GetId().equals(itemId)) {
+                InterestPoints.remove(i);
+                return true;
+            }
+
+        for (int i = 0; i < Walls.size(); i++)
+            if (Walls.get(i).GetId().equals(itemId)) {
+                Walls.remove(i);
+                return true;
+            }
+
+        for (int i = 0; i < CurveWalls.size(); i++)
+            if (CurveWalls.get(i).GetId().equals(itemId)) {
+                CurveWalls.remove(i);
+                return true;
+            }
+
+        return result;
     }
 
     @Override

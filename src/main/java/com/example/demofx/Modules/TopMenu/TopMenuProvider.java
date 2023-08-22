@@ -138,7 +138,8 @@ public class TopMenuProvider implements PropertyChangeListener {
     //////////////////////////////PROJECT_LOGIC
 
     private void verifyProject() {
-
+        HouseProject.getInstance().CheckErrors();
+        //TODO report log output
     }
 
 

@@ -29,6 +29,8 @@ public interface IPropertyChangeble {
 
     Object getPropertyToModalWindow(String key);
 
+    boolean removeObjectWithId(String itemId);
+
     String dataToString();
 
 }

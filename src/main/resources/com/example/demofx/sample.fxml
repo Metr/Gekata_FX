@@ -71,7 +71,7 @@
                            <children>
                               <ScrollPane layoutX="20.0" layoutY="22.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
-                                    <Pane fx:id="MainCanvas" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2000.0" prefWidth="2000.0" />
+                                    <StackPane fx:id="MainCanvas" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2000.0" prefWidth="2000.0" />
                                  </content>
                               </ScrollPane>
                            </children>

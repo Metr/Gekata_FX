@@ -1,5 +1,6 @@
 package com.example.demofx.Utils.Generators;
 
+import com.example.demofx.Models.Basic.HouseProject;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Enums.DescriptionTypes;
 import com.example.demofx.Utils.Events.EventContextController;
@@ -19,6 +20,31 @@ import javafx.scene.layout.VBox;
 import java.util.HashMap;
 
 public class PropertyItemGenerator {
+
+    public static VBox generateTreeButton(String label, EventHandler handler){
+        VBox resultContainer = new VBox();
+
+        resultContainer.setSpacing(5);
+        resultContainer.setAlignment(Pos.CENTER_LEFT);
+        resultContainer.setFillWidth(true);
+
+        HBox propertyItem = new HBox();
+        propertyItem.setAlignment(Pos.CENTER_LEFT);
+        propertyItem.setSpacing(5);
+        VBox.setVgrow(propertyItem, Priority.ALWAYS);
+
+        Button deleteButton = new Button(label);
+        deleteButton.setOnAction(handler);
+
+        propertyItem.getChildren().add(deleteButton);
+
+        VBox.setVgrow(resultContainer, Priority.ALWAYS);
+        resultContainer.getChildren().add(propertyItem);
+
+        return resultContainer;
+    }
+
+
 
     public static VBox generateTreeRedrawOnChangePropertyControl(String label, String startValue, ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
@@ -163,7 +189,6 @@ public class PropertyItemGenerator {
         items.add(DescriptionTypes.TEXT_DESCR.name());
         items.add(DescriptionTypes.GRID_DESCR.name());
         items.add(DescriptionTypes.CHAT_DESCR.name());
-
 
         ChoiceBox<String> choiseBox = new ChoiceBox<String>(items);
         choiseBox.setValue(item);

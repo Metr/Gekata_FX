@@ -10,10 +10,11 @@ import com.example.demofx.Utils.Events.EventContextController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+
+import java.io.File;
 
 
 public class Controller {
@@ -34,7 +35,7 @@ public class Controller {
     public ScrollPane ScrollGraphLevelList;
 
     @FXML
-    private Pane MainCanvas;
+    private StackPane MainCanvas;
 
     @FXML
     private SplitPane MainHorisontalSplitPane;
@@ -100,6 +101,8 @@ public class Controller {
     //      -transport model
     //      -
     //  +level graph analyse
+    //  -level background
+    //  -delete items
     //Upload image to level
     //
 

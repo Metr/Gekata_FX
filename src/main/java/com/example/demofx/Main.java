@@ -7,7 +7,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+
+import java.io.File;
 
 
 public class Main extends Application {
@@ -17,8 +21,6 @@ public class Main extends Application {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = loader.load();
-
-//        Parent root = loader.load(getClass().getResource("sample.fxml"));
 
         primaryStage.setTitle("project GEKATA");
         primaryStage.setScene(new Scene(root, 300, 275));

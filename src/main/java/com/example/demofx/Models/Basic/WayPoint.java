@@ -7,6 +7,7 @@ import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
+import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -250,6 +251,7 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     @Override
     public NodeModelContainer getTreePropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("delete item", event ->  HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
         resultContainer.getChildren().add(PropertyItemGenerator.
                 generateTreeRedrawOnUnFocusPropertyControl("name", this.Name, provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point X", String.valueOf(this.getX()), provider));
@@ -358,21 +360,23 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
 
         //////////////////////////////////////////errors
         if(this.Name.isEmpty())
-            messageMap.put("00004", "Way Point name in empty or null");
+            messageMap.put("00004-"+ ErrorCounterFabric.getCounter(), "Way Point name in empty or null");
         if(this.x_pos <= 0 || this.y_pos <= 0)
-            messageMap.put("00005", "Way Point \'" + this.Name + "\' pos_x or/and pos_y <= 0");
+            messageMap.put("00005-"+ ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' pos_x or/and pos_y <= 0");
         if(this.radius <= 0)
-            messageMap.put("00006", "Way Point \'" + this.Name + "\' radius <= 0");
+            messageMap.put("00006-"+ ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' radius <= 0");
 
 
         //////////////////////////////////////////warnings
         if(this.finishWayPoint == null)
-            messageMap.put("10002", "Way Point \'" + this.Name + "\' dont connected with any Way Point");
-
-
-
+            messageMap.put("10002-"+ ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' dont connected with any Way Point");
 
         return messageMap;
+    }
+
+    @Override
+    public boolean removeObjectWithId(String itemId) {
+        return false;
     }
 
     private final EventHandler<MouseEvent> OnMousePressedEventHandler = new EventHandler<MouseEvent>() {

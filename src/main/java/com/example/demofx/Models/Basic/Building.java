@@ -5,11 +5,13 @@ import com.example.demofx.Interfaces.IPropertyChangeble;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
+import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -190,12 +192,11 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
 
     @Override
     public Node GetDrowableElement() {
-        Group parent = new Group();
-        return parent;
+        return new Group();
     }
 
     public Node GetLevelsGraphNode() {
-        Group parent = new Group();
+        Pane parent = new Pane();
 
         double angle;
         double levelsCount = this.Levels.size();
@@ -287,7 +288,7 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
     }
 
     public Node GetWaypointsGraphNode() {
-        Group parent = new Group();
+        Pane parent = new Pane();
 
         double angle;
         int pointsCount;
@@ -407,22 +408,41 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
     public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
 
         //////////////////////////////errors
-        if(this.name.isEmpty())
-            messageMap.put("00001", "building name in empty or null");
-        if(this.google_adress.isEmpty() && this.yandex_adress.isEmpty() && this.osm_adress.isEmpty() && this.twoGis_adress.isEmpty())
-            messageMap.put("00002", "all address is empty");
+        if (this.name.isEmpty())
+            messageMap.put("00001-"+ ErrorCounterFabric.getCounter(), "building name in empty or null");
+        if (this.google_adress.isEmpty() && this.yandex_adress.isEmpty() && this.osm_adress.isEmpty() && this.twoGis_adress.isEmpty())
+            messageMap.put("00002-"+ ErrorCounterFabric.getCounter(), "all address is empty");
 
 
         //////////////////////////////warnings
-        if(!Levels.isEmpty())
-            for(Level level : this.Levels)
+        if (!Levels.isEmpty())
+            for (Level level : this.Levels)
                 level.ModelErrorsCheck(messageMap);
 
         return messageMap;
     }
 
+    @Override
+    public boolean removeObjectWithId(String itemId) {
+        boolean result = false;
 
-///////////////////////////////////////////////////////////////////
+        for (int i = 0; i < Levels.size(); i++) {
+            if (Levels.get(i).getItemId().equals(itemId)) {
+                Levels.remove(i);
+                EventContextController.RenderAll();
+                return true;
+            } else {
+                if (Levels.get(i).removeObjectWithId(itemId)) {
+                    EventContextController.RenderAll();
+                    return true;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    ///////////////////////////////////////////////////////////////////
 
 
     public String getName() {
@@ -480,7 +500,6 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
     public void setTwoGis_adress(String twoGis_adress) {
         this.twoGis_adress = twoGis_adress;
     }
-
 
 
 }

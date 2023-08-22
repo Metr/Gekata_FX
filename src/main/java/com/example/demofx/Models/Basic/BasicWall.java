@@ -6,6 +6,7 @@ import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
+import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -176,6 +177,7 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
     @Override
     public NodeModelContainer getTreePropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("delete item", event ->  HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point_1 X", String.valueOf(this.getStartX()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point_1 Y", String.valueOf(this.getStartY()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point_2 X", String.valueOf(this.getEndX()), provider));
@@ -186,6 +188,7 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
     @Override
     public NodeModelContainer getWorkbenchPropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("delete item", event ->  HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
         resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point_1 X", String.valueOf(this.getStartX()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point_1 Y", String.valueOf(this.getStartY()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateWorkbenchPropertyControl("point_2 X", String.valueOf(this.getEndX()), provider));
@@ -264,14 +267,19 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
     public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
         //////////////////////////////////////////errors
         if(this.startPoint.getX() < 0 || this.startPoint.getY() < 0)
-            messageMap.put("00010", "Wall start point contains coords < 0");
+            messageMap.put("00010-"+ ErrorCounterFabric.getCounter(), "Wall start point contains coords < 0");
         if(this.endPoint.getX() < 0 || this.endPoint.getY() < 0)
-            messageMap.put("00011", "Wall end point contains coords < 0");
+            messageMap.put("00011-"+ ErrorCounterFabric.getCounter(), "Wall end point contains coords < 0");
 
 
         //////////////////////////////////////////warnings
 
         return messageMap;
+    }
+
+    @Override
+    public boolean removeObjectWithId(String itemId) {
+        return false;
     }
 
     private EventHandler<MouseEvent> OnMousePressedEventHandler = new EventHandler<MouseEvent>() {

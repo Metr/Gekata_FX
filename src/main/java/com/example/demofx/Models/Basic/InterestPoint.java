@@ -10,6 +10,7 @@ import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Enums.DescriptionTypes;
 import com.example.demofx.Utils.Enums.EnumUtils;
 import com.example.demofx.Utils.Events.EventContextController;
+import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -202,6 +203,7 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
     @Override
     public NodeModelContainer getTreePropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("delete item", event ->  HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnUnFocusPropertyControl("name", this.objectName, provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point X", String.valueOf(this.getX()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point Y", String.valueOf(this.getY()), provider));
@@ -259,18 +261,24 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 
         //////////////////////////////////////////errors
         if(this.objectName.isEmpty())
-            messageMap.put("00007", "Interest Point name in empty or null");
+            messageMap.put("00007-"+ ErrorCounterFabric.getCounter(), "Interest Point name in empty or null");
         if(this.x_pos <= 0 || this.y_pos <= 0)
-            messageMap.put("00008", "Interest Point \'" + this.objectName + "\' pos_x or/and pos_y <= 0");
+            messageMap.put("00008-"+ ErrorCounterFabric.getCounter(), "Interest Point \'" + this.objectName + "\' pos_x or/and pos_y <= 0");
         if(this.radius <= 0)
-            messageMap.put("00009", "Interest Point \'" + this.objectName + "\' radius <= 0");
+            messageMap.put("00009-"+ ErrorCounterFabric.getCounter(), "Interest Point \'" + this.objectName + "\' radius <= 0");
 
 
         //////////////////////////////////////////warnings
         if(this.description.isEmpty())
-            messageMap.put("10003", "Interest Point \'" + this.objectName + "\' description is empty");
+            messageMap.put("10003-"+ ErrorCounterFabric.getCounter(), "Interest Point \'" + this.objectName + "\' description is empty");
 
         return messageMap;
+    }
+
+
+    @Override
+    public boolean removeObjectWithId(String itemId) {
+        return false;
     }
 
     @Override
