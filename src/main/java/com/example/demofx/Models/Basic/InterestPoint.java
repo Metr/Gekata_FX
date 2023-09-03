@@ -8,16 +8,14 @@ import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Enums.DescriptionTypes;
-import com.example.demofx.Utils.Enums.EnumUtils;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
+import com.example.demofx.Utils.Fabrics.ItemIdFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -29,7 +27,7 @@ import java.util.*;
 
 public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimitive, IPropertyChangeble {
 
-    private String ItemId;
+    private int ItemId;
     private double x_pos;
     private double y_pos;
     private double radius;
@@ -55,8 +53,17 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
         this.objectName = "unknown object";
         this.contentType = DescriptionTypes.TEXT_DESCR;
 
-        this.ItemId = UUID.randomUUID().toString();
+        this.ItemId = ItemIdFabric.getCounter();
 
+        InitGraphData();
+
+    }
+
+    public InterestPoint() {
+    }
+
+    @Override
+    public void InitGraphData(){
         this.wayPointItemShape = new Circle(x_pos, y_pos, 10);
         wayPointItemShape.setStrokeWidth(3);
         wayPointItemShape.setStroke(Color.BLACK);
@@ -68,7 +75,6 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
         wayPointRadiusShape.setStroke(Color.DEEPSKYBLUE);
         wayPointRadiusShape.setStrokeWidth(2);
         wayPointRadiusShape.setOpacity(0.9);
-
     }
 
     @Override
@@ -90,6 +96,21 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
         this.radius = radius;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setObjectName(String objectName) {
+        this.objectName = objectName;
+    }
+
+    public String getObjectName() {
+        return objectName;
+    }
 
     public DescriptionTypes getContentType() {
         return contentType;
@@ -107,11 +128,11 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
         this.y_pos = y_pos;
     }
 
-    public String getItemId() {
+    public int getItemId() {
         return ItemId;
     }
 
-    public void setItemId(String itemId) {
+    public void setItemId(int itemId) {
         ItemId = itemId;
     }
 
@@ -196,7 +217,7 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
     }
 
     @Override
-    public String GetId() {
+    public int GetId() {
         return this.ItemId;
     }
 
@@ -277,7 +298,7 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 
 
     @Override
-    public boolean removeObjectWithId(String itemId) {
+    public boolean removeObjectWithId(int itemId) {
         return false;
     }
 
@@ -297,17 +318,35 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
                                 this.objectName = text.getText();
                                 break;
                             case "point X":
-                                this.x_pos = Double.valueOf(text.getText());
+                                try {
+                                    this.x_pos = Double.valueOf(text.getText());
+                                }
+                                catch (Exception ex){
+                                    Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                    alert.showAndWait();
+                                    text.setText(""+this.x_pos);
+                                }
                                 break;
                             case "point Y":
-                                this.y_pos = Double.valueOf(text.getText());
+                                try {
+                                    this.y_pos = Double.valueOf(text.getText());
+                                }
+                                catch (Exception ex){
+                                    Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                    alert.showAndWait();
+                                    text.setText(""+this.y_pos);
+                                }
                                 break;
                             case "trust radius":
-                                this.radius = Double.valueOf(text.getText());
+                                try {
+                                    this.radius = Double.valueOf(text.getText());
+                                }
+                                catch (Exception ex){
+                                    Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                    alert.showAndWait();
+                                    text.setText(""+this.radius);
+                                }
                                 break;
-//                            case "content":
-//
-//                                break;
                         }
                     }
                     if (subNode.getClass() == ChoiceBox.class) {
@@ -387,7 +426,7 @@ public class InterestPoint implements IInterestSpot, ISpecialSpot, IGraphPrimiti
 
     @Override
     public String dataToString() {
-        return this.ItemId;
+        return ""+this.ItemId;
     }
 
     @Override

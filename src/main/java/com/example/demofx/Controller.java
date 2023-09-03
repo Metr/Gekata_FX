@@ -97,12 +97,12 @@ public class Controller {
     //Header menu
     //  +Radius visibility+
     //  +Control dots trust-radius connect+
-    //  -create/save/select file project
+    //  +create/save/select file project
     //      -transport model
     //      -
     //  +level graph analyse
-    //  -level background
-    //  -delete items
+    //  +level background
+    //  +delete items
     //Upload image to level
     //
 

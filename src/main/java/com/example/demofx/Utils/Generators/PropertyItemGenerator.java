@@ -131,7 +131,7 @@ public class PropertyItemGenerator {
         return resultContainer;
     }
 
-    public static VBox generateTreePropertyListControl(String label, String item, HashMap<String, String> items, ModelTreeProvider provider) {
+    public static VBox generateTreePropertyListControl(String label, String item, HashMap<Integer, String> items, ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
 
         resultContainer.setSpacing(5);
@@ -323,7 +323,7 @@ public class PropertyItemGenerator {
         return resultContainer;
     }
 
-    public static VBox generateGraphPropertyListControl(String label, String item, HashMap<String, String> items, ModelTreeProvider provider) {
+    public static VBox generateGraphPropertyListControl(String label, String item, HashMap<Integer, String> items, ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
 
         resultContainer.setSpacing(5);

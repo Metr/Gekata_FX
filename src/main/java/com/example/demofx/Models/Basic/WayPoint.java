@@ -8,11 +8,12 @@ import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
+import com.example.demofx.Utils.Fabrics.ItemIdFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -28,7 +29,7 @@ import java.util.*;
 public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeble {
 
     //model variables
-    private String ItemId;
+    private int ItemId;
 
     private String Name;
 
@@ -36,9 +37,10 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     private double y_pos;
     private double radius;
 
-    private String fromLevelId;
+    private int fromLevelId;
 
     private WayPoint finishWayPoint;
+    private int finishWaypointIdBuffer;
     // data variables
 
 
@@ -53,22 +55,28 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     private double orgTranslateX, orgTranslateY;
 
 
-    public WayPoint(int x_pos, int y_pos, double radius, String fromLevelId) {
+    public WayPoint(int x_pos, int y_pos, double radius, int fromLevelId) {
         this.x_pos = x_pos;
         this.y_pos = y_pos;
         this.radius = radius;
 
         this.fromLevelId = fromLevelId;
-//        this.toLevelId = "";
-//        this.toWayPointId = "";
 
-        this.ItemId = UUID.randomUUID().toString();
+        this.ItemId = ItemIdFabric.getCounter();
         this.Name = "no name waypoint " + this.ItemId;
 
+        InitGraphData();
+    }
+
+    public WayPoint() {
+    }
+
+    @Override
+    public void InitGraphData() {
         this.wayPointItemShape = new Circle(x_pos, y_pos, 10);
         wayPointItemShape.setStrokeWidth(3);
         wayPointItemShape.setStroke(Color.BLACK);
-        wayPointItemShape.setFill(Color.TURQUOISE);
+        wayPointItemShape.setFill(Color.RED);
 
         this.wayPointRadiusShape = new Circle(x_pos, y_pos, this.radius);
         wayPointRadiusShape.setRadius(0);
@@ -76,8 +84,8 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         wayPointRadiusShape.setStroke(Color.DEEPSKYBLUE);
         wayPointRadiusShape.setStrokeWidth(2);
         wayPointRadiusShape.setOpacity(0.9);
-
     }
+
 
     public String getName() {
         return Name;
@@ -87,7 +95,7 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         Name = name;
     }
 
-    public String getFromLevelId() {
+    public int getFromLevelId() {
         return fromLevelId;
     }
 
@@ -110,6 +118,18 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         this.radius = radius;
     }
 
+    public void setX_pos(double x_pos) {
+        this.x_pos = x_pos;
+    }
+
+    public void setY_pos(double y_pos) {
+        this.y_pos = y_pos;
+    }
+
+    public void setFromLevelId(int fromLevelId) {
+        this.fromLevelId = fromLevelId;
+    }
+
     public void setX_pos(int x_pos) {
         this.x_pos = x_pos;
     }
@@ -118,11 +138,11 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         this.y_pos = y_pos;
     }
 
-    public String getItemId() {
+    public int getItemId() {
         return ItemId;
     }
 
-    public void setItemId(String itemId) {
+    public void setItemId(int itemId) {
         ItemId = itemId;
     }
 
@@ -136,6 +156,14 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
 
     public Point2D getGraphPoint() {
         return graphPoint;
+    }
+
+    public int getFinishWaypointIdBuffer() {
+        return finishWaypointIdBuffer;
+    }
+
+    public void setFinishWaypointIdBuffer(int finishWaypointIdBuffer) {
+        this.finishWaypointIdBuffer = finishWaypointIdBuffer;
     }
 
     @Override
@@ -244,14 +272,14 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     }
 
     @Override
-    public String GetId() {
+    public int GetId() {
         return this.ItemId;
     }
 
     @Override
     public NodeModelContainer getTreePropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
-        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("delete item", event ->  HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("delete item", event -> HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
         resultContainer.getChildren().add(PropertyItemGenerator.
                 generateTreeRedrawOnUnFocusPropertyControl("name", this.Name, provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point X", String.valueOf(this.getX()), provider));
@@ -299,7 +327,8 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     }
 
     @Override
-    public void setPropertiesFromModalWindow(String key, Object value) {    }
+    public void setPropertiesFromModalWindow(String key, Object value) {
+    }
 
     @Override
     public Object getPropertyToModalWindow(String key) {
@@ -322,14 +351,34 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
                                 this.Name = text.getText();
                                 break;
                             case "point X":
-                                //TODO check text value
-                                this.x_pos = Double.valueOf(text.getText());
+                                try {
+                                    this.x_pos = Double.valueOf(text.getText());
+                                }
+                                catch (Exception ex){
+                                    Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                    alert.showAndWait();
+                                    text.setText(""+this.x_pos);
+                                }
                                 break;
                             case "point Y":
-                                this.y_pos = Double.valueOf(text.getText());
+                                try {
+                                    this.y_pos = Double.valueOf(text.getText());
+                                }
+                                catch (Exception ex){
+                                    Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                    alert.showAndWait();
+                                    text.setText(""+this.y_pos);
+                                }
                                 break;
                             case "trust radius":
-                                this.radius = Double.valueOf(text.getText());
+                                try {
+                                    this.radius = Double.valueOf(text.getText());
+                                }
+                                catch (Exception ex){
+                                    Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                    alert.showAndWait();
+                                    text.setText(""+this.radius);
+                                }
                                 break;
                             case "go to level":
                                 //y2 = Double.valueOf(text.getText());
@@ -339,14 +388,15 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
                     if (subNode.getClass() == ChoiceBox.class) {
                         ChoiceBox<String> choiceBox = (ChoiceBox<String>) subNode;
                         String value = choiceBox.getValue();
-                        HashMap<String, String> waypointMap = HouseProject.getInstance().getBuilding().getIdNameWaypoints();
+                        HashMap<Integer, String> waypointMap = HouseProject.getInstance().getBuilding().getIdNameWaypoints();
                         if (waypointMap.containsValue(value)) {
-                            Set<String> keys = waypointMap.keySet();
-                            for (String key : keys)
-                                if (waypointMap.get(key).equals(value))
+                            Set<Integer> keys = waypointMap.keySet();
+                            for (Integer key : keys)
+                                if (waypointMap.get(key).equals(value)) {
                                     this.finishWayPoint = HouseProject.getInstance().getBuilding().getWayPointWithId(key);
+                                    this.finishWaypointIdBuffer = this.finishWayPoint.getItemId();
+                                }
                         }
-
                     }
                     break;
                 }
@@ -359,23 +409,23 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     public SortedMap<String, String> ModelErrorsCheck(SortedMap<String, String> messageMap) {
 
         //////////////////////////////////////////errors
-        if(this.Name.isEmpty())
-            messageMap.put("00004-"+ ErrorCounterFabric.getCounter(), "Way Point name in empty or null");
-        if(this.x_pos <= 0 || this.y_pos <= 0)
-            messageMap.put("00005-"+ ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' pos_x or/and pos_y <= 0");
-        if(this.radius <= 0)
-            messageMap.put("00006-"+ ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' radius <= 0");
+        if (this.Name.isEmpty())
+            messageMap.put("00004-" + ErrorCounterFabric.getCounter(), "Way Point name in empty or null");
+        if (this.x_pos <= 0 || this.y_pos <= 0)
+            messageMap.put("00005-" + ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' pos_x or/and pos_y <= 0");
+        if (this.radius <= 0)
+            messageMap.put("00006-" + ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' radius <= 0");
 
 
         //////////////////////////////////////////warnings
-        if(this.finishWayPoint == null)
-            messageMap.put("10002-"+ ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' dont connected with any Way Point");
+        if (this.finishWayPoint == null)
+            messageMap.put("10002-" + ErrorCounterFabric.getCounter(), "Way Point \'" + this.Name + "\' dont connected with any Way Point");
 
         return messageMap;
     }
 
     @Override
-    public boolean removeObjectWithId(String itemId) {
+    public boolean removeObjectWithId(int itemId) {
         return false;
     }
 
@@ -442,7 +492,7 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
 
     @Override
     public String dataToString() {
-        return this.ItemId;
+        return "" + this.ItemId;
     }
 
 

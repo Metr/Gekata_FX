@@ -7,10 +7,13 @@ import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
+import com.example.demofx.Utils.Fabrics.ItemIdFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -18,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.QuadCurve;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -27,7 +31,7 @@ import java.util.UUID;
 
 public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
 
-    private String ItemId;
+    private int ItemId;
 
     private Point2D startPoint;
     private Point2D endPoint;
@@ -57,13 +61,27 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
     public BasicWall(double x1, double y1, double x2, double y2) {
         this.startPoint = new Point2D.Double(x1, y1);
         this.endPoint = new Point2D.Double(x2, y2);
+        this.ItemId = ItemIdFabric.getCounter();
+        this.lastChange = "last change: " + date.getTime().toString().substring(0, 19);
+        InitGraphData();
+    }
+
+    public BasicWall() {
+        this.startPointShape = new Circle();
+        this.endPointShape = new Circle();
+
+        this.startPoint = new Point2D.Double();
+        this.endPoint = new Point2D.Double();
+
+        this.simpleWall = new Line();
+    }
+
+    @Override
+    public void InitGraphData() {
         this.startPointShape = new Circle(startPoint.getX(), startPoint.getY(), 0);
         this.endPointShape = new Circle(endPoint.getX(), endPoint.getY(), 0);
         this.simpleWall = new Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
-        this.ItemId = UUID.randomUUID().toString();
-        this.lastChange = "last change: " + date.getTime().toString().substring(0, 19);
     }
-
 
     public void setStartPoint(Point2D startPoint) {
         lastChange = "last change: " + date.getTime().toString().substring(0, 19);
@@ -110,6 +128,10 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
 
     public double getEndY() {
         return endPoint.getY();
+    }
+
+    public void setItemId(int itemId) {
+        ItemId = itemId;
     }
 
     public void setLine(Line newLine) {
@@ -170,7 +192,7 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
     }
 
     @Override
-    public String GetId() {
+    public int GetId() {
         return this.ItemId;
     }
 
@@ -227,16 +249,44 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
                     TextField text = (TextField) subNode;
                     switch (text.getId()) {
                         case "point_1 X":
-                            x1 = Double.valueOf(text.getText());
+                            try {
+                                x1 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+x1);
+                            }
                             break;
                         case "point_1 Y":
-                            y1 = Double.valueOf(text.getText());
+                            try {
+                                y1 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+y1);
+                            }
                             break;
                         case "point_2 X":
-                            x2 = Double.valueOf(text.getText());
+                            try {
+                                x2 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+x2);
+                            }
                             break;
                         case "point_2 Y":
-                            y2 = Double.valueOf(text.getText());
+                            try {
+                                y2 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+y2);
+                            }
                             break;
                     }
                     break;
@@ -278,7 +328,7 @@ public class BasicWall implements IGraphPrimitive, IPropertyChangeble {
     }
 
     @Override
-    public boolean removeObjectWithId(String itemId) {
+    public boolean removeObjectWithId(int itemId) {
         return false;
     }
 

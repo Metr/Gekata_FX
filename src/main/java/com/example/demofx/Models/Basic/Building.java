@@ -22,6 +22,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 
 public class Building implements IPropertyChangeble, IGraphPrimitive {
@@ -86,6 +87,10 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
         return getName();
     }
 
+    @Override
+    public void InitGraphData() {
+
+    }
 
     public void getPropertiesFromNode(VBox vBox) {
         //по свойствам
@@ -134,35 +139,54 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
         return dontExist;
     }
 
-    public String getLevelNameWithId(String id) {
+    public String getLevelNameWithId(int id) {
         String name = "NaN";
 
         for (int i = 0; i < Levels.size(); i++) {
-            if (Levels.get(i).getItemId().equals(id))
+            if (Levels.get(i).getItemId() == id)
                 return Levels.get(i).getName();
         }
 
         return name;
     }
 
-    public WayPoint getWayPointWithId(String id) {
-        String name = "NaN";
+    public WayPoint getWayPointWithId(int id) {
 
         for (int i = 0; i < Levels.size(); i++) {
             for (WayPoint wayPoint : Levels.get(i).getWayPointsToGraph())
-                if (wayPoint.getItemId().equals(id))
+                if (wayPoint.getItemId() == id)
                     return wayPoint;
         }
 
         return null;
     }
 
-    public HashMap<String, String> getIdNameWaypoints() {
-        HashMap<String, String> map = new HashMap<String, String>();
+    public HashMap<Integer, String> getIdNameWaypoints() {
+        HashMap<Integer, String> map = new HashMap<Integer, String>();
         for (Level level : Levels)
             for (WayPoint wayPoint : level.getWayPointsToGraph())
                 map.put(wayPoint.getItemId(), wayPoint.getName());
         return map;
+    }
+
+    public HashMap<Integer, WayPoint> getIdPointWaypoints() {
+        HashMap<Integer, WayPoint> map = new HashMap<Integer, WayPoint>();
+        for (Level level : Levels)
+            for (WayPoint wayPoint : level.getWayPointsToGraph())
+                map.put(wayPoint.getItemId(), wayPoint);
+        return map;
+    }
+
+    public void getRestoredWaypointsConnectList() {
+        HashMap<Integer, WayPoint> map = getIdPointWaypoints();
+        for (Map.Entry<Integer, WayPoint> item : map.entrySet()) {
+            if(item.getValue().getFinishWaypointIdBuffer() >= 0)
+            {
+                item.getValue().setFinishWayPoint(map.get(item.getValue().getFinishWaypointIdBuffer()));
+            }
+
+
+        }
     }
 
     @Override
@@ -210,7 +234,7 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
         double levelX, levelY;
 
         ArrayList<Point2D> levelPoints = new ArrayList<>();
-        HashMap<String, Level> levelMap = new HashMap<>();
+        HashMap<Integer, Level> levelMap = new HashMap<>();
 
         for (Level level : Levels) {
             levelMap.put(level.getItemId(), level);
@@ -226,7 +250,7 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
         }
 
         counter = 0;
-        String levelId;
+        int levelId;
         double x1, y1, x2, y2;
         double dist;
         double triangleArrowX1, triangleArrowX2, triangleArrowY1, triangleArrowY2;
@@ -392,8 +416,8 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
     }
 
     @Override
-    public String GetId() {
-        return "build";
+    public int GetId() {
+        return -1;
     }
 
     public void addLevel(Level level) {
@@ -409,9 +433,9 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
 
         //////////////////////////////errors
         if (this.name.isEmpty())
-            messageMap.put("00001-"+ ErrorCounterFabric.getCounter(), "building name in empty or null");
+            messageMap.put("00001-" + ErrorCounterFabric.getCounter(), "building name in empty or null");
         if (this.google_adress.isEmpty() && this.yandex_adress.isEmpty() && this.osm_adress.isEmpty() && this.twoGis_adress.isEmpty())
-            messageMap.put("00002-"+ ErrorCounterFabric.getCounter(), "all address is empty");
+            messageMap.put("00002-" + ErrorCounterFabric.getCounter(), "all address is empty");
 
 
         //////////////////////////////warnings
@@ -423,11 +447,11 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
     }
 
     @Override
-    public boolean removeObjectWithId(String itemId) {
+    public boolean removeObjectWithId(int itemId) {
         boolean result = false;
 
         for (int i = 0; i < Levels.size(); i++) {
-            if (Levels.get(i).getItemId().equals(itemId)) {
+            if (Levels.get(i).getItemId() == itemId) {
                 Levels.remove(i);
                 EventContextController.RenderAll();
                 return true;

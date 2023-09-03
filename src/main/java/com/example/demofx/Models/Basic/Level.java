@@ -6,6 +6,7 @@ import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
+import com.example.demofx.Utils.Fabrics.ItemIdFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -27,7 +28,7 @@ import java.util.UUID;
 
 public class Level implements IPropertyChangeble, IGraphPrimitive {
 
-    private String ItemId;
+    private int ItemId;
 
     private ArrayList<IGraphPrimitive> Walls;
 
@@ -47,15 +48,19 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     public Level() {
         this.Name = "unknown level " + HouseProject.getInstance().getBuilding().getLevels().size();
         this.Walls = new ArrayList<IGraphPrimitive>();
+        this.CurveWalls = new ArrayList<IGraphPrimitive>();
         this.WayPoints = new ArrayList<IGraphPrimitive>();
         this.InterestPoints = new ArrayList<IGraphPrimitive>();
+
+        this.levelShape = new Circle();
+        this.levelNameLabel = new Label();
 
 //        for (int i = 0; i < 30; i += 2)
 //            this.Walls.add(new BasicWall(i, i, i + 100, i));
     }
 
     public Level(String name) {
-        this.ItemId = UUID.randomUUID().toString();
+        this.ItemId = ItemIdFabric.getCounter();
         this.imagePath = "";
         this.Name = name;
         this.levelShape = new Circle();
@@ -102,11 +107,11 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
         Name = name;
     }
 
-    public String getItemId() {
+    public int getItemId() {
         return ItemId;
     }
 
-    public void setItemId(String itemId) {
+    public void setItemId(int itemId) {
         ItemId = itemId;
     }
 
@@ -187,6 +192,11 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
                 EventContextController.RenderAll();
             }
         }
+    }
+
+    @Override
+    public void InitGraphData() {
+
     }
 
     @Override
@@ -314,29 +324,29 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     }
 
     @Override
-    public boolean removeObjectWithId(String itemId) {
+    public boolean removeObjectWithId(int itemId) {
         boolean result = false;
 
         for (int i = 0; i < WayPoints.size(); i++)
-            if (WayPoints.get(i).GetId().equals(itemId)) {
+            if (WayPoints.get(i).GetId() == itemId) {
                 WayPoints.remove(i);
                 return true;
             }
 
         for (int i = 0; i < InterestPoints.size(); i++)
-            if (InterestPoints.get(i).GetId().equals(itemId)) {
+            if (InterestPoints.get(i).GetId() == itemId) {
                 InterestPoints.remove(i);
                 return true;
             }
 
         for (int i = 0; i < Walls.size(); i++)
-            if (Walls.get(i).GetId().equals(itemId)) {
+            if (Walls.get(i).GetId() == itemId) {
                 Walls.remove(i);
                 return true;
             }
 
         for (int i = 0; i < CurveWalls.size(); i++)
-            if (CurveWalls.get(i).GetId().equals(itemId)) {
+            if (CurveWalls.get(i).GetId() == itemId) {
                 CurveWalls.remove(i);
                 return true;
             }
@@ -345,7 +355,7 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     }
 
     @Override
-    public String GetId() {
+    public int GetId() {
         return this.ItemId;
     }
 }

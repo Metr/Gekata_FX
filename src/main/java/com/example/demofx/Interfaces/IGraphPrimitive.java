@@ -10,11 +10,13 @@ import java.util.ArrayList;
 
 public interface IGraphPrimitive {
 
+    void InitGraphData();
+
     Node GetDrowableElement();
 
     NodeModelContainer GetContainer();
 
-    String GetId();
+    int GetId();
 
 
     ArrayList<Point2D> GetPointsToConnect();

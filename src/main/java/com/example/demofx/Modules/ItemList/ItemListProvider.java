@@ -76,7 +76,7 @@ public class ItemListProvider implements PropertyChangeListener {
         if (!HouseProject.getInstance().getBuilding().getLevels().isEmpty()) {
             String selectedLevelName = EventContextController.getWorkbenchProvider().getSelectedLevelName();
             int index = HouseProject.getInstance().getBuilding().getIndexLevelWithName(selectedLevelName);
-            String selectedLevelId = HouseProject.getInstance().getBuilding().getLevels().get(index).getItemId();
+            int selectedLevelId = HouseProject.getInstance().getBuilding().getLevels().get(index).getItemId();
             WayPoint wayPoint = new WayPoint(200, 200, 40, selectedLevelId);
             HouseProject.getInstance().getBuilding().getLevels().get(index).getWayPoints().add(wayPoint);
         }

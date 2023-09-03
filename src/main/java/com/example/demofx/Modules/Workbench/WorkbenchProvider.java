@@ -4,6 +4,8 @@ import com.example.demofx.Models.Basic.HouseProject;
 import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -40,25 +42,32 @@ public class WorkbenchProvider implements PropertyChangeListener {
             String path = HouseProject.getInstance().getBuilding().getLevels().get(index).getImagePath();
             StackPane pane = new StackPane();
             if(path.isEmpty()) {
-                BackgroundFill backgroundFill = new BackgroundFill(Color.GOLDENROD, null, null);
+                BackgroundFill backgroundFill = new BackgroundFill(Color.WHITE, null, null);
                 Background background = new Background(backgroundFill);
                 pane.setBackground(background);
                 MainCanvas.getChildren().add(pane);
             }
             else {
-                Image image = new Image(path);
-                BackgroundSize size = new BackgroundSize(100, 100, true, true, true, false);
-                BackgroundImage backgroundImage = new BackgroundImage(image,
-                        BackgroundRepeat.NO_REPEAT,
-                        BackgroundRepeat.NO_REPEAT,
-                        null,
-                        size);
+                try {
+                    Image image = new Image(path);
+                    BackgroundSize size = new BackgroundSize(100, 100, true, true, true, false);
+                    BackgroundImage backgroundImage = new BackgroundImage(image,
+                            BackgroundRepeat.NO_REPEAT,
+                            BackgroundRepeat.NO_REPEAT,
+                            null,
+                            size);
 
-                Background background = new Background(backgroundImage);
-                pane.setBackground(background);
-                double opacity = 0.01 * (int)WorkbenchProperties.getInstance().getPropertyByName("BGOpacity");
-                pane.setOpacity(opacity);
-                MainCanvas.getChildren().add(pane);
+                    Background background = new Background(backgroundImage);
+                    pane.setBackground(background);
+                    double opacity = 0.01 * (int) WorkbenchProperties.getInstance().getPropertyByName("BGOpacity");
+                    pane.setOpacity(opacity);
+                    MainCanvas.getChildren().add(pane);
+                }
+                catch (Exception ex){
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "The background image cannot be found at the specified address. " +
+                            "Please set it again: Project tree > select level > levels property > Set Background", ButtonType.OK);
+                    alert.showAndWait();
+                }
             }
             MainCanvas.getChildren().add(HouseProject.getInstance().getBuilding().getLevels().get(index).getLevelNode());
         }
@@ -70,7 +79,8 @@ public class WorkbenchProvider implements PropertyChangeListener {
          MainCanvas.getChildren().add(HouseProject.getInstance().getBuilding().GetLevelsGraphNode());
      }
      else {
-         //TODO alert window
+         Alert alert = new Alert(Alert.AlertType.WARNING, "The number of Levels in the project should be more than 1", ButtonType.OK);
+         alert.showAndWait();
          System.out.println("levels.count < 2");
      }
     }
@@ -81,8 +91,9 @@ public class WorkbenchProvider implements PropertyChangeListener {
             MainCanvas.getChildren().add(HouseProject.getInstance().getBuilding().GetWaypointsGraphNode());
         }
         else {
-            //TODO alert window
-            System.out.println("levels.count < 2");
+            Alert alert = new Alert(Alert.AlertType.WARNING, "The number of Levels in the project should be more than 0", ButtonType.OK);
+            alert.showAndWait();
+//            System.out.println("levels.count < 2");
         }
     }
 

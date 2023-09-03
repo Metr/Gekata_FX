@@ -7,10 +7,13 @@ import com.example.demofx.Utils.Configs.WorkbenchProperties;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
+import com.example.demofx.Utils.Fabrics.ItemIdFabric;
 import com.example.demofx.Utils.Generators.PropertyItemGenerator;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -28,7 +31,7 @@ import java.util.UUID;
 
 public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
 
-    private final String ItemId;
+    private int ItemId;
 
     private Point2D startPoint;
     private Point2D endPoint;
@@ -58,15 +61,9 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         this.endPoint = new Point2D.Double(x2, y2);
         this.controlPoint = new Point((int)(x2-x1), (int)(y2-y1));
 
-        this.startPointShape = new Circle(startPoint.getX(), startPoint.getY(), 0);
-        this.endPointShape = new Circle(endPoint.getX(), endPoint.getY(), 0);
-        this.controlPointShape = new Circle(controlPoint.getX(), controlPoint.getY(), 0);
-
-        this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
-                controlPoint.getX(),controlPoint.getY(),
-                endPoint.getX(), endPoint.getY());
-        this.ItemId = UUID.randomUUID().toString();
+        this.ItemId = ItemIdFabric.getCounter();
         this.lastChange = "last change: " + date.getTime().toString().substring(0, 19);
+        InitGraphData();
     }
 
     public QuadCurveWall(double x1, double y1, double control_x, double control_y, double x2, double y2) {
@@ -74,6 +71,26 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         this.endPoint = new Point2D.Double(x2, y2);
         this.controlPoint = new Point((int)(control_x), (int)(control_y));
 
+        this.ItemId = ItemIdFabric.getCounter();
+        this.lastChange = "last change: " + date.getTime().toString().substring(0, 19);
+
+        InitGraphData();
+    }
+
+    public QuadCurveWall() {
+        this.startPointShape = new Circle();
+        this.endPointShape = new Circle();
+        this.controlPointShape = new Circle();
+
+        this.startPoint = new Point2D.Double();
+        this.endPoint = new Point2D.Double();
+        this.controlPoint = new Point2D.Double();
+
+        this.quadCurve = new QuadCurve();
+    }
+
+    @Override
+    public void InitGraphData() {
         this.startPointShape = new Circle(startPoint.getX(), startPoint.getY(), 0);
         this.endPointShape = new Circle(endPoint.getX(), endPoint.getY(), 0);
         this.controlPointShape = new Circle(controlPoint.getX(), controlPoint.getY(), 0);
@@ -85,10 +102,11 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         this.quadCurve.setStrokeWidth(3);
         this.quadCurve.setStroke(Color.BLACK);
         this.quadCurve.setFill(Color.TRANSPARENT);
-
-        this.ItemId = UUID.randomUUID().toString();
-        this.lastChange = "last change: " + date.getTime().toString().substring(0, 19);
     }
+
+
+
+
 
     public void setStartPoint(Point2D startPoint) {
         lastChange = "last change: " + date.getTime().toString().substring(0, 19);
@@ -145,6 +163,16 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                 controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
     }
 
+
+
+    public int getItemId() {
+        return ItemId;
+    }
+
+    public void setItemId(int itemId) {
+        ItemId = itemId;
+    }
+
     public double getStartX() {
         return startPoint.getX();
     }
@@ -174,6 +202,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
         this.quadCurve = new QuadCurve(startPoint.getX(), startPoint.getY(),
                 controlPoint.getX(), controlPoint.getY(), endPoint.getX(), endPoint.getY());
     }
+
 
 
     @Override
@@ -250,7 +279,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
     }
 
     @Override
-    public String GetId() {
+    public int GetId() {
         return this.ItemId;
     }
 
@@ -317,22 +346,64 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
                     TextField text = (TextField) subNode;
                     switch (text.getId()) {
                         case "point_1 X":
-                            x1 = Double.valueOf(text.getText());
+                            try {
+                                x1 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+x1);
+                            }
                             break;
                         case "point_1 Y":
-                            y1 = Double.valueOf(text.getText());
+                            try {
+                                y1 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+y1);
+                            }
                             break;
                         case "point_2 X":
-                            x2 = Double.valueOf(text.getText());
+                            try {
+                                x2 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+x2);
+                            }
                             break;
                         case "point_2 Y":
-                            y2 = Double.valueOf(text.getText());
+                            try {
+                                y2 = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+y2);
+                            }
                             break;
                         case "control X":
-                            control_x = Double.valueOf(text.getText());
+                            try {
+                                control_x = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+control_x);
+                            }
                             break;
                         case "control Y":
-                            control_y = Double.valueOf(text.getText());
+                            try {
+                                control_y = Double.valueOf(text.getText());
+                            }
+                            catch (Exception ex){
+                                Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
+                                alert.showAndWait();
+                                text.setText(""+control_y);
+                            }
                             break;
                     }
                     break;
@@ -366,7 +437,7 @@ public class QuadCurveWall implements IGraphPrimitive, IPropertyChangeble {
     }
 
     @Override
-    public boolean removeObjectWithId(String itemId) {
+    public boolean removeObjectWithId(int itemId) {
         return false;
     }
 

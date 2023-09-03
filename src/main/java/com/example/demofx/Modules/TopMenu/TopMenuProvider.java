@@ -38,20 +38,20 @@ public class TopMenuProvider implements PropertyChangeListener {
         createNewProjectItem.setOnAction(event -> drawLevelsGraph());
 
         MenuItem openProjectItem = new MenuItem("Open Project");
-        openProjectItem.setOnAction(event -> drawLevelsGraph());
+        openProjectItem.setOnAction(event -> openProject());
 
         MenuItem uploadProjectItem = new MenuItem("connect to...");
         uploadProjectItem.setOnAction(event -> drawLevelsGraph());
 
         MenuItem saveProjectItem = new MenuItem("Save Project");
-        saveProjectItem.setOnAction(event -> drawLevelsGraph());
+        saveProjectItem.setOnAction(event -> saveProject());
 
         MenuItem saveAsProjectItem = new MenuItem("Save Project As..");
-        saveAsProjectItem.setOnAction(event -> drawLevelsGraph());
+        saveAsProjectItem.setOnAction(event -> saveProjectAs());
 
         SeparatorMenuItem separatorMenuItem = new SeparatorMenuItem();
 
-        MenuItem verifyProjectItem = new MenuItem("(test) check errors");
+        MenuItem verifyProjectItem = new MenuItem("Check errors");
         verifyProjectItem.setOnAction(event -> verifyProject());
 
         menuProject.getItems().add(createNewProjectItem);
@@ -135,6 +135,7 @@ public class TopMenuProvider implements PropertyChangeListener {
     //////////ITEMS_LOGIC////////////////////////
 
 
+
     //////////////////////////////PROJECT_LOGIC
 
     private void verifyProject() {
@@ -142,6 +143,17 @@ public class TopMenuProvider implements PropertyChangeListener {
         //TODO report log output
     }
 
+    private void saveProject(){
+        HouseProject.getInstance().saveProject();
+    }
+
+    private void saveProjectAs(){
+        HouseProject.getInstance().saveProjectAs();
+    }
+
+    private void openProject(){
+        HouseProject.getInstance().openProject();
+    }
 
     //////////////////////////////SETTINGS_LOGIC
     private void openWorkbenchPropertyWindow() {
