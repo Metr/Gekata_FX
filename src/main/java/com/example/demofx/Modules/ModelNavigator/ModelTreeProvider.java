@@ -78,7 +78,9 @@ public class ModelTreeProvider implements PropertyChangeListener {
         );
     }
 
-
+    public void PropertyItemClear(){
+        this.PropertyView.getChildren().clear();
+    }
 
     public void TreeViewSelectionChanged(ObservableValue<? extends TreeItem<String>> changed, TreeItem<String> oldValue, TreeItem<String> newValue) {
         if (newValue != null) {

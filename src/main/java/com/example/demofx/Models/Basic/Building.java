@@ -161,6 +161,15 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
         return null;
     }
 
+    private boolean isBuildingHaveExit(){
+        for(Level level : this.Levels){
+            for (WayPoint wayPoint : level.getWayPointsToGraph())
+                if (wayPoint.isOutdoorConnected())
+                    return true;
+        }
+        return  false;
+    }
+
     public HashMap<Integer, String> getIdNameWaypoints() {
         HashMap<Integer, String> map = new HashMap<Integer, String>();
         for (Level level : Levels)
@@ -436,7 +445,8 @@ public class Building implements IPropertyChangeble, IGraphPrimitive {
             messageMap.put("00001-" + ErrorCounterFabric.getCounter(), "building name in empty or null");
         if (this.google_adress.isEmpty() && this.yandex_adress.isEmpty() && this.osm_adress.isEmpty() && this.twoGis_adress.isEmpty())
             messageMap.put("00002-" + ErrorCounterFabric.getCounter(), "all address is empty");
-
+        if(!isBuildingHaveExit())
+            messageMap.put("00015-" + ErrorCounterFabric.getCounter(), "any waypoints are not tagged as exit");
 
         //////////////////////////////warnings
         if (!Levels.isEmpty())

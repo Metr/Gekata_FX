@@ -21,6 +21,7 @@ public class WayPointDeserializer implements JsonDeserializer<WayPoint> {
         point.setX_pos(jsonObject.get("x").getAsDouble());
         point.setY_pos(jsonObject.get("y").getAsDouble());
         point.setRadius(jsonObject.get("r").getAsDouble());
+        point.setOutdoorConnected(jsonObject.get("r").getAsBoolean());
 
         point.setFromLevelId(jsonObject.get("lvl").getAsInt());
         point.setFinishWaypointIdBuffer(jsonObject.get("fnsh").getAsInt());

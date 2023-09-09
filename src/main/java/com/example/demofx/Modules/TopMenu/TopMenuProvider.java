@@ -2,7 +2,11 @@ package com.example.demofx.Modules.TopMenu;
 
 import com.example.demofx.Models.Basic.HouseProject;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
+import com.example.demofx.Utils.Dialogs.NewProjectDialog;
+import com.example.demofx.Utils.Dialogs.TextPropertyDialog;
 import com.example.demofx.Utils.Dialogs.WorkbenchPropertyDialog;
+import com.example.demofx.Utils.Enums.DescriptionTypes;
+import com.example.demofx.Utils.Events.EventContextController;
 import javafx.scene.control.*;
 
 import java.beans.PropertyChangeEvent;
@@ -10,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 
 public class TopMenuProvider implements PropertyChangeListener {
@@ -35,7 +40,7 @@ public class TopMenuProvider implements PropertyChangeListener {
         //create/open/upload/save/save_as/project_check
 
         MenuItem createNewProjectItem = new MenuItem("Create Project");
-        createNewProjectItem.setOnAction(event -> drawLevelsGraph());
+        createNewProjectItem.setOnAction(event -> createEmptyProject());
 
         MenuItem openProjectItem = new MenuItem("Open Project");
         openProjectItem.setOnAction(event -> openProject());
@@ -139,8 +144,18 @@ public class TopMenuProvider implements PropertyChangeListener {
     //////////////////////////////PROJECT_LOGIC
 
     private void verifyProject() {
-        HouseProject.getInstance().CheckErrors();
+        EventContextController.getBottomOutputProvider().setText(HouseProject.getInstance().CheckErrors());
         //TODO report log output
+    }
+
+    private void createEmptyProject(){
+        NewProjectDialog newProjectDialog = new NewProjectDialog();
+        Optional<String> result = newProjectDialog.Show();
+
+        if (result.isPresent()) {
+            HouseProject.getInstance().SetProjectEmpty(result.get());
+            EventContextController.RenderAll();
+        }
     }
 
     private void saveProject(){

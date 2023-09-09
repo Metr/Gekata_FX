@@ -46,6 +46,8 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     Label levelNameLabel;
 
     public Level() {
+        this.ItemId = ItemIdFabric.getCounter();
+        this.imagePath = "";
         this.Name = "unknown level " + HouseProject.getInstance().getBuilding().getLevels().size();
         this.Walls = new ArrayList<IGraphPrimitive>();
         this.CurveWalls = new ArrayList<IGraphPrimitive>();
@@ -203,6 +205,7 @@ public class Level implements IPropertyChangeble, IGraphPrimitive {
     public NodeModelContainer getTreePropertyNode(ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("Delete item", event -> HouseProject.getInstance().RemoveObjectWithID(this.ItemId)));
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("create copy of this level", event -> HouseProject.getInstance().createCopyOfLevel(this)));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeButton("Set background", event -> this.setLevelBackgroundImage()));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnUnFocusPropertyControl("name", this.Name, provider));
         return new NodeModelContainer(resultContainer, this, this);

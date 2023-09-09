@@ -18,6 +18,7 @@ public class WayPointSerializer implements JsonSerializer<WayPoint> {
         result.addProperty("x", src.getX());
         result.addProperty("y", src.getY());
         result.addProperty("r", src.getRadius());
+        result.addProperty("out", src.isOutdoorConnected());
 
         result.addProperty("lvl", src.getFromLevelId());
 

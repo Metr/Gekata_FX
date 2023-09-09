@@ -1,6 +1,7 @@
 package com.example.demofx;
 
 import com.example.demofx.Models.Basic.HouseProject;
+import com.example.demofx.Modules.BottomOutput.BottomOutputProvider;
 import com.example.demofx.Modules.ItemList.ItemListProvider;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Modules.TopMenu.TopMenuProvider;
@@ -35,6 +36,9 @@ public class Controller {
     public ScrollPane ScrollGraphLevelList;
 
     @FXML
+    public TextArea warning_output;
+
+    @FXML
     private StackPane MainCanvas;
 
     @FXML
@@ -64,8 +68,9 @@ public class Controller {
     WorkbenchProvider workbenchProvider;
     ItemListProvider itemListProvider;
     ModelTreeProvider modelTreeProvider;
-
     TopMenuProvider topMenuProvider;
+
+    BottomOutputProvider bottomOutputProvider;
 
     public Controller() {
         System.out.println("start");
@@ -87,9 +92,10 @@ public class Controller {
         itemListProvider = new ItemListProvider(GraphElementsControl, ScrollGraphItemList, LevelItemList, ScrollGraphLevelList);
         modelTreeProvider = new ModelTreeProvider(ModelTreeControl, ItemPropertyControl);
         topMenuProvider = new TopMenuProvider(TopMenuBar);
+        bottomOutputProvider = new BottomOutputProvider(warning_output);
 
         EventContextController contextController = new EventContextController();
-        contextController.setProviders(workbenchProvider, itemListProvider, modelTreeProvider, topMenuProvider);
+        contextController.setProviders(workbenchProvider, itemListProvider, modelTreeProvider, topMenuProvider, bottomOutputProvider);
 
     }
 

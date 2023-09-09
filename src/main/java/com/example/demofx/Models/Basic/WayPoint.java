@@ -21,6 +21,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -38,6 +40,8 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     private double radius;
 
     private int fromLevelId;
+
+    private boolean isOutdoorConnected;
 
     private WayPoint finishWayPoint;
     private int finishWaypointIdBuffer;
@@ -59,6 +63,7 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         this.x_pos = x_pos;
         this.y_pos = y_pos;
         this.radius = radius;
+        this.isOutdoorConnected = false;
 
         this.fromLevelId = fromLevelId;
 
@@ -97,6 +102,14 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
 
     public int getFromLevelId() {
         return fromLevelId;
+    }
+
+    public boolean isOutdoorConnected() {
+        return isOutdoorConnected;
+    }
+
+    public void setOutdoorConnected(boolean outdoorConnected) {
+        isOutdoorConnected = outdoorConnected;
     }
 
     @Override
@@ -192,7 +205,14 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         if (finishWayPoint == null) {
             circle.setFill(Color.RED);
         }
+        if (isOutdoorConnected) {
+            //TODO draw exit
+            Line floor  = new Line(x-15,y+15, x+15,y+15);
+            floor.setFill(Color.BLACK);
+            floor.setStrokeWidth(3);
 
+            parent.getChildren().add(floor);
+        }
 
         parent.getChildren().add(circle);
         parent.getChildren().add(label);
@@ -256,6 +276,13 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
             if (finishWayPoint == null) {
                 wayPointItemShape.setFill(Color.RED);
             }
+
+            if (isOutdoorConnected) {
+                Line floor  = new Line(this.x_pos-15,this.y_pos+15, this.x_pos+15,this.y_pos+15);
+                floor.setFill(Color.BLACK);
+                floor.setStrokeWidth(3);
+                parent.getChildren().add(floor);
+            }
         }
 
         parent.getChildren().add(wayPointRadiusShape);
@@ -285,6 +312,12 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point X", String.valueOf(this.getX()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("point Y", String.valueOf(this.getY()), provider));
         resultContainer.getChildren().add(PropertyItemGenerator.generateTreeRedrawOnChangePropertyControl("trust radius", String.valueOf(this.getRadius()), provider));
+        HashMap<Integer, String> map = new HashMap<>();
+        map.put(0, "false");
+        map.put(1, "true");
+        resultContainer.getChildren().add(PropertyItemGenerator.generateTreePropertyListControl("is outdoor connected", "" + this.isOutdoorConnected,
+                map, provider));
+
         if (finishWayPoint == null)
             resultContainer.getChildren().add(PropertyItemGenerator.generateTreePropertyListControl("go to point"
                     , "NaN"
@@ -307,6 +340,11 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
     public NodeModelContainer getGraphPropertyNode() {
         VBox resultContainer = new VBox();
         resultContainer.getChildren().add(PropertyItemGenerator.generateGraphRedrawOnChangePropertyControl("name", this.Name, EventContextController.getModelTreeProvider()));
+        HashMap<Integer, String> map = new HashMap<>();
+        map.put(0, "false");
+        map.put(1, "true");
+        resultContainer.getChildren().add(PropertyItemGenerator.generateGraphPropertyListControl("is outdoor connected", "" + this.isOutdoorConnected,
+                map, EventContextController.getModelTreeProvider()));
         if (finishWayPoint == null)
             resultContainer.getChildren().add(PropertyItemGenerator.generateGraphPropertyListControl("go to point"
                     , "NaN"
@@ -353,50 +391,61 @@ public class WayPoint implements ISpecialSpot, IGraphPrimitive, IPropertyChangeb
                             case "point X":
                                 try {
                                     this.x_pos = Double.valueOf(text.getText());
-                                }
-                                catch (Exception ex){
+                                } catch (Exception ex) {
                                     Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
                                     alert.showAndWait();
-                                    text.setText(""+this.x_pos);
+                                    text.setText("" + this.x_pos);
                                 }
                                 break;
                             case "point Y":
                                 try {
                                     this.y_pos = Double.valueOf(text.getText());
-                                }
-                                catch (Exception ex){
+                                } catch (Exception ex) {
                                     Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
                                     alert.showAndWait();
-                                    text.setText(""+this.y_pos);
+                                    text.setText("" + this.y_pos);
                                 }
                                 break;
                             case "trust radius":
                                 try {
                                     this.radius = Double.valueOf(text.getText());
-                                }
-                                catch (Exception ex){
+                                } catch (Exception ex) {
                                     Alert alert = new Alert(Alert.AlertType.WARNING, "Input data can't be parsed to coordinates", ButtonType.OK);
                                     alert.showAndWait();
-                                    text.setText(""+this.radius);
+                                    text.setText("" + this.radius);
                                 }
-                                break;
-                            case "go to level":
-                                //y2 = Double.valueOf(text.getText());
                                 break;
                         }
                     }
                     if (subNode.getClass() == ChoiceBox.class) {
                         ChoiceBox<String> choiceBox = (ChoiceBox<String>) subNode;
                         String value = choiceBox.getValue();
-                        HashMap<Integer, String> waypointMap = HouseProject.getInstance().getBuilding().getIdNameWaypoints();
-                        if (waypointMap.containsValue(value)) {
-                            Set<Integer> keys = waypointMap.keySet();
-                            for (Integer key : keys)
-                                if (waypointMap.get(key).equals(value)) {
-                                    this.finishWayPoint = HouseProject.getInstance().getBuilding().getWayPointWithId(key);
-                                    this.finishWaypointIdBuffer = this.finishWayPoint.getItemId();
+                        switch (choiceBox.getId()) {
+                            case "go to point":
+                                HashMap<Integer, String> waypointMap = HouseProject.getInstance().getBuilding().getIdNameWaypoints();
+                                if (waypointMap.containsValue(value)) {
+                                    Set<Integer> keys = waypointMap.keySet();
+                                    for (Integer key : keys)
+                                        if (waypointMap.get(key).equals(value)) {
+                                            this.finishWayPoint = HouseProject.getInstance().getBuilding().getWayPointWithId(key);
+                                            this.finishWaypointIdBuffer = this.finishWayPoint.getItemId();
+                                        }
                                 }
+                                break;
+                            case "is outdoor connected":
+                                switch (value){
+                                    case "true":
+                                        this.isOutdoorConnected = true;
+                                        break;
+                                    case "false":
+                                        this.isOutdoorConnected = false;
+                                        break;
+                                    default: break;
+                                }
+                                break;
+
                         }
+
                     }
                     break;
                 }

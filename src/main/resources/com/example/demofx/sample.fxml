@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <GridPane fx:id="MainContainer" gridLinesVisible="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demofx.Controller">
 
@@ -112,7 +113,10 @@
                </children></AnchorPane>
           <AnchorPane fx:id="item_2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                <children>
-                  <Button fx:id="button1" layoutX="452.0" layoutY="5.0" mnemonicParsing="false" onAction="#click" text="Button" />
+                   <TextArea fx:id="warning_output" editable="false" prefHeight="192.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" GridPane.fillHeight="0" GridPane.fillWidth="0">
+                     <font>
+                        <Font size="16.0" />
+                     </font></TextArea>
                </children></AnchorPane>
         </items>
       </SplitPane>

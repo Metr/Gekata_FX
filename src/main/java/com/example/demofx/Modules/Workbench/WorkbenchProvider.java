@@ -97,6 +97,10 @@ public class WorkbenchProvider implements PropertyChangeListener {
         }
     }
 
+    public void Clear(){
+        MainCanvas.getChildren().clear();
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override

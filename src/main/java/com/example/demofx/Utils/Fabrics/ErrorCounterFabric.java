@@ -8,6 +8,7 @@ public class ErrorCounterFabric {
         return counter++;
     }
 
+
     public static void resetCounter(){
         counter = 0;
     }

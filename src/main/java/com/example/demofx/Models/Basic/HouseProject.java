@@ -1,5 +1,8 @@
 package com.example.demofx.Models.Basic;
 
+import com.example.demofx.Controller;
+import com.example.demofx.Interfaces.IGraphPrimitive;
+import com.example.demofx.Main;
 import com.example.demofx.Utils.Containers.NodeModelContainer;
 import com.example.demofx.Utils.Events.EventContextController;
 import com.example.demofx.Utils.Fabrics.ErrorCounterFabric;
@@ -16,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -78,6 +82,25 @@ public class HouseProject {
         ProjectName = projectName;
     }
 
+    ///MODEL LOGIC////////////////////////////////////////
+
+    public void createCopyOfLevel(Level example){
+        Level level = new Level("copy of " + example.getName());
+
+        for (IGraphPrimitive wall : example.getWalls()) {
+            BasicWall buffer = (BasicWall) wall;
+            level.getWalls().add(new BasicWall(buffer.getStartX(), buffer.getStartY(), buffer.getEndX(), buffer.getEndY()));
+        }
+
+        for (IGraphPrimitive wall : example.getCurveWalls()) {
+            QuadCurveWall buffer = (QuadCurveWall) wall;
+            level.getCurveWalls().add(new QuadCurveWall(buffer.getStartX(), buffer.getStartY(), buffer.getControlX(), buffer.getControlY(), buffer.getEndX(), buffer.getEndY()));
+        }
+
+        this.building.getLevels().add(level);
+
+        EventContextController.RenderAll();
+    }
 
 
     ///PROJECT FILE////////////////////////////////////////
@@ -100,6 +123,18 @@ public class HouseProject {
                 this.isNoErrors = false;
         }
         return report;
+    }
+
+    public void SetProjectEmpty(String projectName){
+        houseProject.building = new Building();
+        houseProject.isNoErrors = true;
+        houseProject.ProjectName = projectName;
+        houseProject.SelectedItem = null;
+
+        EventContextController.getWorkbenchProvider().Clear();
+        EventContextController.getModelTreeProvider().PropertyItemClear();
+
+        ItemIdFabric.resetCounter();
     }
 
     public void saveProject() {
@@ -204,8 +239,8 @@ public class HouseProject {
 
         if (file != null) {
             try (JsonReader reader = new JsonReader(new FileReader(file.getAbsoluteFile()))) {
-
                 gson.fromJson(reader, HouseProject.class);
+                Main.getpStage().setTitle("project GEKATA: " + HouseProject.getInstance().getProjectName());
                 EventContextController.RenderAll();
             } catch (Exception e) {
                 e.printStackTrace();

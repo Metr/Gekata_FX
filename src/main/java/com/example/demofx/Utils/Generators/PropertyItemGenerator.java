@@ -45,7 +45,7 @@ public class PropertyItemGenerator {
     }
 
 
-
+    //label + text field
     public static VBox generateTreeRedrawOnChangePropertyControl(String label, String startValue, ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
 
@@ -84,6 +84,7 @@ public class PropertyItemGenerator {
         return resultContainer;
     }
 
+    //label + text field
     public static VBox generateTreeRedrawOnUnFocusPropertyControl(String label, String startValue, ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
 
@@ -131,6 +132,7 @@ public class PropertyItemGenerator {
         return resultContainer;
     }
 
+    //label + listBox
     public static VBox generateTreePropertyListControl(String label, String item, HashMap<Integer, String> items, ModelTreeProvider provider) {
         VBox resultContainer = new VBox();
 
@@ -151,6 +153,7 @@ public class PropertyItemGenerator {
 
         ObservableList<String> levels = FXCollections.observableArrayList(items.values());
         ChoiceBox<String> choiseBox = new ChoiceBox<String>(levels);
+        choiseBox.setId(label);
         choiseBox.setValue(item);
         choiseBox.setMaxWidth(200);
         choiseBox.setMinWidth(200);

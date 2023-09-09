@@ -1,5 +1,8 @@
 package com.example.demofx.Utils.Events;
 
+import com.example.demofx.Main;
+import com.example.demofx.Models.Basic.HouseProject;
+import com.example.demofx.Modules.BottomOutput.BottomOutputProvider;
 import com.example.demofx.Modules.ItemList.ItemListProvider;
 import com.example.demofx.Modules.ModelNavigator.ModelTreeProvider;
 import com.example.demofx.Modules.TopMenu.TopMenuProvider;
@@ -13,8 +16,8 @@ public class EventContextController {
     private static WorkbenchProvider workbenchProvider;
     private static ItemListProvider itemListProvider;
     private static ModelTreeProvider modelTreeProvider;
-
     private static TopMenuProvider topMenuProvider;
+    private static BottomOutputProvider bottomOutputProvider;
 
     public static synchronized EventContextController getInstance() {
         if (EventsController == null) {
@@ -24,11 +27,14 @@ public class EventContextController {
         return EventsController;
     }
 
-    public void setProviders(WorkbenchProvider _workbenchProvider, ItemListProvider _itemListProvider, ModelTreeProvider _modelTreeProvider, TopMenuProvider _topMenuProvider)    {
+    public void setProviders(WorkbenchProvider _workbenchProvider, ItemListProvider _itemListProvider,
+                             ModelTreeProvider _modelTreeProvider, TopMenuProvider _topMenuProvider,
+                             BottomOutputProvider _bottomOutputProvider)    {
         workbenchProvider = _workbenchProvider;
         itemListProvider = _itemListProvider;
         modelTreeProvider = _modelTreeProvider;
         topMenuProvider = _topMenuProvider;
+        bottomOutputProvider = _bottomOutputProvider;
 
         itemListProvider.addPropertyChangeListener(workbenchProvider);
         itemListProvider.addPropertyChangeListener(modelTreeProvider);
@@ -50,6 +56,7 @@ public class EventContextController {
    public static void RenderAll(){
         workbenchProvider.BroadcastReRenderCommand();
         itemListProvider.BroadcastReRenderCommand();
+       Main.getpStage().setTitle("Project GEKATA: " + HouseProject.getInstance().getProjectName());
    }
 
     public static WorkbenchProvider getWorkbenchProvider() {
@@ -66,5 +73,9 @@ public class EventContextController {
 
     public static TopMenuProvider getTopMenuProvider() {
         return topMenuProvider;
+    }
+
+    public static BottomOutputProvider getBottomOutputProvider() {
+        return bottomOutputProvider;
     }
 }
